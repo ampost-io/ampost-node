@@ -1,0 +1,72 @@
+{
+  "name": "ampost",
+  "version": "0.1.0",
+  "description": "Official Node.js and TypeScript SDK for the Ampost API: publish and schedule posts on Instagram, Facebook, Threads, X, YouTube, Pinterest, Bluesky, Telegram and Discord with one call.",
+  "license": "MIT",
+  "author": "Ampost (https://ampost.io)",
+  "homepage": "https://ampost.io/docs?ref=npm",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ampost-io/ampost-node.git"
+  },
+  "bugs": "https://github.com/ampost-io/ampost-node/issues",
+  "keywords": [
+    "ampost",
+    "social-media",
+    "social-media-api",
+    "instagram-api",
+    "tiktok-api",
+    "linkedin-api",
+    "twitter-api",
+    "youtube-api",
+    "bluesky",
+    "threads",
+    "scheduler",
+    "sdk"
+  ],
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --import tsx --test test/*.test.ts",
+    "test:smoke": "node --import tsx --test test/smoke.ts",
+    "check": "npm run generate && git diff --exit-code -- . && npm run typecheck && npm test && npm run build",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@types/node": "18.19.130",
+    "openapi-typescript": "7.13.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  }
+}

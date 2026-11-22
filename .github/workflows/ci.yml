@@ -1,0 +1,58 @@
+# CI for this repo once it lives at github.com/ampost-io/ampost-node. While the code is in the Ampost
+# app repo (public-repos/ampost-node), the root workflow .github/workflows/public-repos.yml runs instead.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  generated-code:
+    name: Generated code matches openapi.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run generate
+      - name: Fail if the committed code is stale
+        run: git diff --exit-code || (echo "::error::Run npm run generate and commit the result" && exit 1)
+
+  test:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  smoke:
+    name: Smoke test against the real API
+    runs-on: ubuntu-latest
+    env:
+      AMPOST_API_KEY: ${{ secrets.AMPOST_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Smoke test (skipped without the AMPOST_API_KEY secret)
+        run: npm run test:smoke
