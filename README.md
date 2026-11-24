@@ -192,7 +192,7 @@ published package has no dependencies and its methods read like the API docs.
 - [API docs](https://ampost.io/docs?ref=github) and [llms.txt](https://ampost.io/llms.txt?ref=github)
 - [MCP server](https://ampost.io/docs/mcp?ref=github)
 - [Pricing](https://ampost.io/pricing?ref=github)
-- [Python SDK](https://github.com/ampost-io/ampost-python)
+- [Python SDK](https://github.com/ampost-io/ampost-python) and [Ruby SDK](https://github.com/ampost-io/ampost-ruby)
 
 ## License
 
