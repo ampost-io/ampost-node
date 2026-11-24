@@ -32,7 +32,7 @@ export interface paths {
         };
         /**
          * List posts
-         * @description List your posts, newest first, optionally filtered by status, platform, platform set (posts with an account in it) or text.
+         * @description List your posts, newest created first, as full post objects (status, text, media, schedule, targets and `platformPosts`, the result per account). Use it to find posts: filter by `status`, `platform`, `platformSetId` (posts with an account in that set) or `search` (text match); filters combine. To read one post whose id you have, use posts_get; for views, likes and other metrics, use analytics_posts. Paginated with `limit` and `offset`; `pagination.hasMore` says whether another page exists. A key restricted to some platform sets sees only their posts. An unknown `platformSetId` is 404 PLATFORM_SET_NOT_FOUND.
          *
          *     MCP tool: `posts_list`. Key scope: `posts:read`.
          */
@@ -104,7 +104,7 @@ export interface paths {
         };
         /**
          * Get a post
-         * @description Get one post with its result per account (`platformPosts`).
+         * @description Get one post by id: its status, text, media, schedule, targets, options and `platformPosts`, one entry per account with that account's status, platform post id, `publishedUrl`, `error` or `notice`, and its first comment and thread results. Use it to follow a post you know the id of, such as after posts_create or posts_publish, or to see why an account failed; use posts_list to find posts by status, platform, set or text, and analytics_posts for metrics. 404 POST_NOT_FOUND when no post with this id is yours, or the key cannot see any of its platform sets.
          *
          *     MCP tool: `posts_get`. Key scope: `posts:read`.
          */
@@ -113,7 +113,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a post
-         * @description Discard a post that has not been published, including a scheduled one. The post stays readable with status `discarded`, and its media in Ampost storage is deleted. To take a published post down from the platforms, use posts_unpublish.
+         * @description Discard a post that has not been published, including a scheduled one. The post stays readable with status `discarded`, and its media in Ampost storage is deleted. To take a published post down from the platforms, use posts_unpublish. Returns the discarded post. 404 POST_NOT_FOUND for an id that is not yours; 409 INVALID_STATUS_TRANSITION for a post that is posting, published, discarded or deleted.
          *
          *     MCP tool: `posts_delete`. Key scope: `posts:write`.
          */
@@ -122,7 +122,7 @@ export interface paths {
         head?: never;
         /**
          * Update a post
-         * @description Change a draft or scheduled post. Send only the fields to change; `media` and `targets` replace the whole list (accounts the post keeps keep their results). `options` is merged per platform: each `options.<platform>` you send replaces that platform's options as a whole, `null` removes them, and other platforms keep theirs. Set `scheduledFor` to null to turn a scheduled post back into a draft. To change the text of a published post, use posts_edit_published.
+         * @description Change a draft or scheduled post. Send only the fields to change; `media` and `targets` replace the whole list (accounts the post keeps keep their results). `options` is merged per platform: each `options.<platform>` you send replaces that platform's options as a whole, `null` removes them, and other platforms keep theirs. Set `scheduledFor` to null to turn a scheduled post back into a draft. To change the text of a published post, use posts_edit_published. Returns the updated post. 404 POST_NOT_FOUND for an id that is not yours; 409 INVALID_STATUS_TRANSITION unless the post is a draft, scheduled or queued.
          *
          *     MCP tool: `posts_update`. Key scope: `posts:write`.
          */
@@ -140,7 +140,7 @@ export interface paths {
         put?: never;
         /**
          * Publish a post now
-         * @description Publish a draft or scheduled post to all its accounts now. Check `platformPosts` for each account's result; an account with a video may stay `processing` (the platform is still processing it) for a few minutes before it is `published`.
+         * @description Publish a draft or scheduled post to all its accounts now. Check `platformPosts` for each account's result; an account with a video may stay `processing` (the platform is still processing it) for a few minutes before it is `published`; follow it with posts_get. To publish later, set `scheduledFor` with posts_update instead; to publish again to accounts that failed, use posts_retry. 404 POST_NOT_FOUND for an id that is not yours; 409 INVALID_STATUS_TRANSITION for a post that is posting, published, discarded or deleted.
          *
          *     MCP tool: `posts_publish`. Key scope: `posts:write`.
          */
@@ -162,7 +162,7 @@ export interface paths {
         put?: never;
         /**
          * Unpublish a post
-         * @description Take a published post down from the platforms: every account where it is published, or only the given `accountIds` (from `platformPosts[].accountId`). Each account's result is in `platformPosts`: `deleted`, or still `published` with `notice` saying why (`UNPUBLISH_NOT_SUPPORTED` on Instagram and TikTok, which have no delete API; the platform's own refusal otherwise, such as Telegram's 48-hour limit for bots). The post becomes `deleted` once no account has it; it stays readable in Ampost. YouTube deletes count in the channel's daily budget of edits and deletes (10, 3 on Free; `notice` `RATE_LIMITED` past it). Call platforms_list for `unpublish.supported` per platform. Deleting from X costs X units like a post.
+         * @description Take a published post down from the platforms: every account where it is published, or only the given `accountIds` (from `platformPosts[].accountId`). Each account's result is in `platformPosts`: `deleted`, or still `published` with `notice` saying why (`UNPUBLISH_NOT_SUPPORTED` on Instagram and TikTok, which have no delete API; the platform's own refusal otherwise, such as Telegram's 48-hour limit for bots). The post becomes `deleted` once no account has it; it stays readable in Ampost. YouTube deletes count in the channel's daily budget of edits and deletes (10, 3 on Free; `notice` `RATE_LIMITED` past it). Call platforms_list for `unpublish.supported` per platform. Deleting from X costs X units like a post. To discard a post that is not published yet, use posts_delete. 404 POST_NOT_FOUND for an id that is not yours; 409 INVALID_STATUS_TRANSITION when no given account has it published.
          *
          *     MCP tool: `posts_unpublish`. Key scope: `posts:write`.
          */
@@ -184,7 +184,7 @@ export interface paths {
         put?: never;
         /**
          * Edit a published post's text
-         * @description Replace the text of a published post on the platforms: every account where it is published, or only the given `accountIds` (from `platformPosts[].accountId`). Text only; media and links stay. Each account's result is in `platformPosts`: an edited account's `text` holds the new text, and an account the platform refused keeps its text with `notice` (`EDIT_NOT_SUPPORTED` on Instagram, Threads, TikTok, Bluesky and X, and on Facebook stories; the platform's own refusal otherwise). Facebook edits only posts Ampost published; a Telegram caption under media stays limited to 1024 characters. YouTube and Pinterest replace the video or Pin description. YouTube edits and deletes share a budget of 10 a day per channel (3 on Free); past it the account gets `notice` `RATE_LIMITED`. Call platforms_list for `editPublished.supported` per platform. To change a draft or scheduled post, use posts_update.
+         * @description Replace the text of a published post on the platforms: every account where it is published, or only the given `accountIds` (from `platformPosts[].accountId`). Text only; media and links stay. Each account's result is in `platformPosts`: an edited account's `text` holds the new text, and an account the platform refused keeps its text with `notice` (`EDIT_NOT_SUPPORTED` on Instagram, Threads, TikTok, Bluesky and X, and on Facebook stories; the platform's own refusal otherwise). Facebook edits only posts Ampost published; a Telegram caption under media stays limited to 1024 characters. YouTube and Pinterest replace the video or Pin description. YouTube edits and deletes share a budget of 10 a day per channel (3 on Free); past it the account gets `notice` `RATE_LIMITED`. Call platforms_list for `editPublished.supported` per platform. To change a draft or scheduled post, use posts_update. 404 POST_NOT_FOUND for an id that is not yours; 409 INVALID_STATUS_TRANSITION when no given account has it published.
          *
          *     MCP tool: `posts_edit_published`. Key scope: `posts:write`.
          */
@@ -206,7 +206,7 @@ export interface paths {
         put?: never;
         /**
          * Retry failed accounts
-         * @description Publish again to the accounts that failed, or only to the given `accountIds` (from `platformPosts[].accountId`). Ampost already retries retryable failures (rate limits, timeouts, platform errors) by itself, up to 5 attempts with backoff; an account waiting for that shows `pending` with `nextAttemptAt`. Call this for an account that is `failed`, after fixing the cause. It starts `attempts` again from 0. A published account whose first comment failed (`platformPosts[].firstComment.status` failed) posts only the comment again, without publishing the post twice or counting it again. An account whose thread stopped at a failed item continues the thread from that item, without publishing the post or the earlier items again.
+         * @description Publish again to the accounts that failed, or only to the given `accountIds` (from `platformPosts[].accountId`). Ampost already retries retryable failures (rate limits, timeouts, platform errors) by itself, up to 5 attempts with backoff; an account waiting for that shows `pending` with `nextAttemptAt`. Call this for an account that is `failed`, after fixing the cause. It starts `attempts` again from 0. A published account whose first comment failed (`platformPosts[].firstComment.status` failed) posts only the comment again, without publishing the post twice or counting it again. An account whose thread stopped at a failed item continues the thread from that item, without publishing the post or the earlier items again. To publish a draft or scheduled post, use posts_publish. 404 POST_NOT_FOUND for an id that is not yours; 409 INVALID_STATUS_TRANSITION unless the post is `partial` or `failed` (or only first comments failed).
          *
          *     MCP tool: `posts_retry`. Key scope: `posts:write`.
          */
@@ -270,7 +270,7 @@ export interface paths {
         };
         /**
          * List social accounts
-         * @description List your social accounts, optionally only one platform or one platform set. `status` defaults to `active`, the accounts that can publish; pass `revoked` for disconnected accounts or `all` for both. The `active` total for a set equals that set's `accountCount` in platform_sets_list. `health` says whether each account can publish (`canPost`), whether only a reconnect helps (`needsReconnect`), and why (`issues[]` with codes such as `TOKEN_EXPIRED` or `MISSING_SCOPE:w_member_social`). Fix with accounts_connect and the account's id as `accountId`. `platformMetadata` has public per-platform details, such as the TikTok creator's allowed privacy levels.
+         * @description List your social accounts, optionally only one platform or one platform set. `status` defaults to `active`, the accounts that can publish; pass `revoked` for disconnected accounts or `all` for both. The `active` total for a set equals that set's `accountCount` in platform_sets_list. `health` says whether each account can publish (`canPost`), whether only a reconnect helps (`needsReconnect`), and why (`issues[]` with codes such as `TOKEN_EXPIRED` or `MISSING_SCOPE:w_member_social`). Fix with accounts_connect and the account's id as `accountId`. `platformMetadata` has public per-platform details, such as the TikTok creator's allowed privacy levels. Use it to see what a user can post to or to find an account id; use accounts_get to re-check one account whose id you have, and platform_sets_list for the sets themselves. Paginated with `limit` and `offset`. A key restricted to some sets sees only their accounts; an unknown `platformSetId` is 404 PLATFORM_SET_NOT_FOUND.
          *
          *     MCP tool: `accounts_list`. Key scope: `accounts:read`.
          */
@@ -292,7 +292,7 @@ export interface paths {
         };
         /**
          * Get a connected account
-         * @description Get one social account by id, including revoked ones (`status: revoked`). `health`: `canPost`, `needsReconnect` and `issues[]` (codes such as `ACCOUNT_REVOKED`, `TOKEN_EXPIRED`, `MISSING_SCOPE:<scope>`, each with a message to relay). When `needsReconnect` is true, call accounts_connect with `accountId` set to this id; the account keeps its id. `platformMetadata` has public per-platform details.
+         * @description Get one social account by id, including revoked ones (`status: revoked`). `health`: `canPost`, `needsReconnect` and `issues[]` (codes such as `ACCOUNT_REVOKED`, `TOKEN_EXPIRED`, `MISSING_SCOPE:<scope>`, each with a message to relay). When `needsReconnect` is true, call accounts_connect with `accountId` set to this id; the account keeps its id. `platformMetadata` has public per-platform details. Use it to check one account before posting or after a reconnect; use accounts_list to find accounts by platform, set or status. 404 ACCOUNT_NOT_FOUND when no account with this id is yours or the key is restricted to other sets.
          *
          *     MCP tool: `accounts_get`. Key scope: `accounts:read`.
          */
@@ -430,7 +430,7 @@ export interface paths {
         };
         /**
          * List platform sets
-         * @description List your platform sets with their active account counts, default set first. `accountCount` counts only active accounts, the same ones accounts_list returns by default; revoked accounts are not counted. A platform set groups at most one account per platform; every post targets one set.
+         * @description List your platform sets, default set first: each with its `id`, `name`, `isDefault` and `accountCount`. A platform set groups at most one account per platform (for example one brand's Instagram, LinkedIn and X); posts, queues and connections target a set by `id`. Use this to find a set's id or to pick a set with the user; use platform_sets_get to re-read one set whose id you have, and accounts_list with `platformSetId` for the accounts in a set. `accountCount` counts only active accounts, the same ones accounts_list returns by default; revoked accounts are not counted. Paginated with `limit` and `offset`. A key restricted to some sets sees only those.
          *
          *     MCP tool: `platform_sets_list`. Key scope: `accounts:read`.
          */
@@ -438,7 +438,7 @@ export interface paths {
         put?: never;
         /**
          * Create a platform set
-         * @description Create an empty platform set. You can have at most 20 sets.
+         * @description Create an empty platform set with this name and return it. Add accounts to it with accounts_connect and its `platformSetId`; to rename a set, use platform_sets_update. You can have at most 20 sets (409 PLATFORM_SET_LIMIT_REACHED). A key restricted to some sets cannot create one (403 PLATFORM_SET_NOT_ALLOWED).
          *
          *     MCP tool: `platform_sets_create`. Key scope: `accounts:write`.
          */
@@ -458,7 +458,7 @@ export interface paths {
         };
         /**
          * Get a platform set
-         * @description Get one platform set with its active account count (revoked accounts are not counted).
+         * @description Get one platform set by id: `name`, `isDefault`, `accountCount` (active accounts only; revoked ones are not counted) and its timestamps. Use it when you have the id, for example to check a set still exists or its account count before posting to it; use platform_sets_list to find a set or see all of them, and accounts_list with `platformSetId` for the accounts themselves. 404 PLATFORM_SET_NOT_FOUND when no set with this id is yours or the key is restricted to other sets.
          *
          *     MCP tool: `platform_sets_get`. Key scope: `accounts:read`.
          */
@@ -476,7 +476,7 @@ export interface paths {
         head?: never;
         /**
          * Rename a platform set
-         * @description Rename a platform set, including the default set.
+         * @description Rename a platform set, including the default set, and return it. Only the name changes: accounts, posts and the queue stay. 404 PLATFORM_SET_NOT_FOUND for an unknown id; 403 PLATFORM_SET_NOT_ALLOWED for a set the key is restricted from.
          *
          *     MCP tool: `platform_sets_update`. Key scope: `accounts:write`.
          */
@@ -492,7 +492,7 @@ export interface paths {
         };
         /**
          * Get a posting queue
-         * @description Get the posting queue of a platform set. A set without a saved queue answers with no slots in UTC. Each platform set has one queue: weekly slots (weekday and HH:MM) in an IANA time zone, which follow its daylight saving changes. posts_create with `useQueue: true` schedules the post in the set's next free slot. A slot is taken while a queued post is scheduled at its time; rescheduling, publishing or deleting the post frees it.
+         * @description Get a platform set's queue settings: its `timezone` and weekly `slots` (weekday and HH:MM), sorted by weekday and time. A set without a saved queue answers with no slots in UTC (`updatedAt` null). Use it to read or show the weekly pattern before changing it with queue_update; to see the actual upcoming dates and which are free or taken by a post, use queue_slots. 404 PLATFORM_SET_NOT_FOUND when the set is not yours or the key is restricted to other sets. Each platform set has one queue: weekly slots (weekday and HH:MM) in an IANA time zone, which follow its daylight saving changes. posts_create with `useQueue: true` schedules the post in the set's next free slot. A slot is taken while a queued post is scheduled at its time; rescheduling, publishing or deleting the post frees it.
          *
          *     MCP tool: `queue_get`. Key scope: `posts:read`.
          */
@@ -504,7 +504,7 @@ export interface paths {
         head?: never;
         /**
          * Update a posting queue
-         * @description Set the time zone or the weekly slots of a platform set's queue; `slots` replaces the whole list. Queues need the Pro plan or above (403 UPGRADE_REQUIRED). Posts already in the queue keep their time. Each platform set has one queue: weekly slots (weekday and HH:MM) in an IANA time zone, which follow its daylight saving changes. posts_create with `useQueue: true` schedules the post in the set's next free slot. A slot is taken while a queued post is scheduled at its time; rescheduling, publishing or deleting the post frees it.
+         * @description Set the time zone or the weekly slots of a platform set's queue; `slots` replaces the whole list. Queues need the Pro plan or above (403 UPGRADE_REQUIRED). Posts already in the queue keep their time. Returns the saved queue; omitted fields keep their value. 403 PLATFORM_SET_NOT_ALLOWED for a set the key is restricted from; 404 PLATFORM_SET_NOT_FOUND for an unknown set. Each platform set has one queue: weekly slots (weekday and HH:MM) in an IANA time zone, which follow its daylight saving changes. posts_create with `useQueue: true` schedules the post in the set's next free slot. A slot is taken while a queued post is scheduled at its time; rescheduling, publishing or deleting the post frees it.
          *
          *     MCP tool: `queue_update`. Key scope: `posts:write`.
          */
@@ -520,7 +520,7 @@ export interface paths {
         };
         /**
          * Preview queue slots
-         * @description The queue's next slot times from now on, each with the queued post holding it (`postId`, null when free). With `filter: free` the first slot is where posts_create with `useQueue` puts the next post. Each platform set has one queue: weekly slots (weekday and HH:MM) in an IANA time zone, which follow its daylight saving changes. posts_create with `useQueue: true` schedules the post in the set's next free slot. A slot is taken while a queued post is scheduled at its time; rescheduling, publishing or deleting the post frees it.
+         * @description The queue's next slot times from now on, as ISO timestamps (`scheduledFor`), each with the queued post holding it (`postId`, null when free); empty when the queue has no slots. With `filter: free` the first slot is where posts_create with `useQueue` puts the next post. Use it to tell the user when a queued post would go out or which times are taken; to read or change the weekly pattern itself, use queue_get and queue_update. `count` sets how many slots (1-50, default 10). 404 PLATFORM_SET_NOT_FOUND when the set is not yours or the key is restricted to other sets. Each platform set has one queue: weekly slots (weekday and HH:MM) in an IANA time zone, which follow its daylight saving changes. posts_create with `useQueue: true` schedules the post in the set's next free slot. A slot is taken while a queued post is scheduled at its time; rescheduling, publishing or deleting the post frees it.
          *
          *     MCP tool: `queue_slots`. Key scope: `posts:read`.
          */
@@ -542,7 +542,7 @@ export interface paths {
         };
         /**
          * Post analytics
-         * @description Metrics of your published posts, newest first: one `platformPosts` entry per account the post went to, with views, reach, likes, comments, shares and saves (null when the platform does not report one). Pass `postId` for one post. `analyticsStatus` says why an entry has no metrics. Analytics cover Facebook Pages, Instagram, Threads, TikTok, Bluesky, YouTube and Pinterest accounts (on YouTube and Pinterest only posts published through Ampost; LinkedIn once its API access is approved), X accounts that opted in with accounts_set_analytics (Max and Scale; only posts published through Ampost), and Telegram followers (no post metrics). Discord has no analytics: asking for it fails with 422 `ANALYTICS_NOT_AVAILABLE_ON_PLATFORM`. When none of the matching accounts has analytics enabled the call fails with 403 `ANALYTICS_NOT_ENABLED` (its `details.accounts` say why per account). Ampost reads analytics in the background and serves the stored numbers: each account about hourly (daily on the Free plan), a post's metrics hourly in its first 48 hours, every 6 hours up to 14 days and daily up to 90 days. X posts are read daily in their first 3 days and weekly up to 29 days, which costs the plan's X units. Meta itself can lag 24-48 hours. `syncedAt` says when each number was read.
+         * @description Metrics of your published posts, newest first: one `platformPosts` entry per account the post went to, with views, reach, likes, comments, shares and saves (null when the platform does not report one). Pass `postId` for one post. `analyticsStatus` says why an entry has no metrics. Use it for per-post numbers; for totals per account over a date range use analytics_overview, for follower counts over time analytics_followers, and for a post's publish status posts_get. Filter by `postId`, `platform`, `platformSetId` or `accountId`; paginated with `limit` and `offset`. 404 POST_NOT_FOUND or ACCOUNT_NOT_FOUND for an id that is not yours. Analytics cover Facebook Pages, Instagram, Threads, TikTok, Bluesky, YouTube and Pinterest accounts (on YouTube and Pinterest only posts published through Ampost; LinkedIn once its API access is approved), X accounts that opted in with accounts_set_analytics (Max and Scale; only posts published through Ampost), and Telegram followers (no post metrics). Discord has no analytics: asking for it fails with 422 `ANALYTICS_NOT_AVAILABLE_ON_PLATFORM`. When none of the matching accounts has analytics enabled the call fails with 403 `ANALYTICS_NOT_ENABLED` (its `details.accounts` say why per account). Ampost reads analytics in the background and serves the stored numbers: each account about hourly (daily on the Free plan), a post's metrics hourly in its first 48 hours, every 6 hours up to 14 days and daily up to 90 days. X posts are read daily in their first 3 days and weekly up to 29 days, which costs the plan's X units. Meta itself can lag 24-48 hours. `syncedAt` says when each number was read.
          *
          *     MCP tool: `analytics_posts`. Key scope: `analytics:read`.
          */
@@ -564,7 +564,7 @@ export interface paths {
         };
         /**
          * Analytics overview
-         * @description Per account and in total, for posts published between `from` and `to` (UTC days, default the last 30): post count, summed views, reach, likes, comments, shares and saves, followers and their change, and sync state. These are the dashboard's numbers. `unavailableAccounts` lists matching accounts without analytics and why. Analytics cover Facebook Pages, Instagram, Threads, TikTok, Bluesky, YouTube and Pinterest accounts (on YouTube and Pinterest only posts published through Ampost; LinkedIn once its API access is approved), X accounts that opted in with accounts_set_analytics (Max and Scale; only posts published through Ampost), and Telegram followers (no post metrics). Discord has no analytics: asking for it fails with 422 `ANALYTICS_NOT_AVAILABLE_ON_PLATFORM`. When none of the matching accounts has analytics enabled the call fails with 403 `ANALYTICS_NOT_ENABLED` (its `details.accounts` say why per account). Ampost reads analytics in the background and serves the stored numbers: each account about hourly (daily on the Free plan), a post's metrics hourly in its first 48 hours, every 6 hours up to 14 days and daily up to 90 days. X posts are read daily in their first 3 days and weekly up to 29 days, which costs the plan's X units. Meta itself can lag 24-48 hours. `syncedAt` says when each number was read.
+         * @description Per account and in total, for posts published between `from` and `to` (UTC days, default the last 30): post count, summed views, reach, likes, comments, shares and saves, followers and their change, and sync state. These are the dashboard's numbers. `unavailableAccounts` lists matching accounts without analytics and why. Use it for a summary or a period comparison (call it twice with different ranges); for each post's own metrics use analytics_posts, and for the day-by-day follower curve analytics_followers. Filter by `platform`, `platformSetId` or `accountId`; not paginated. A range longer than 90 days or with `from` after `to` is 400 VALIDATION_FAILED. Analytics cover Facebook Pages, Instagram, Threads, TikTok, Bluesky, YouTube and Pinterest accounts (on YouTube and Pinterest only posts published through Ampost; LinkedIn once its API access is approved), X accounts that opted in with accounts_set_analytics (Max and Scale; only posts published through Ampost), and Telegram followers (no post metrics). Discord has no analytics: asking for it fails with 422 `ANALYTICS_NOT_AVAILABLE_ON_PLATFORM`. When none of the matching accounts has analytics enabled the call fails with 403 `ANALYTICS_NOT_ENABLED` (its `details.accounts` say why per account). Ampost reads analytics in the background and serves the stored numbers: each account about hourly (daily on the Free plan), a post's metrics hourly in its first 48 hours, every 6 hours up to 14 days and daily up to 90 days. X posts are read daily in their first 3 days and weekly up to 29 days, which costs the plan's X units. Meta itself can lag 24-48 hours. `syncedAt` says when each number was read.
          *
          *     MCP tool: `analytics_overview`. Key scope: `analytics:read`.
          */
@@ -586,7 +586,7 @@ export interface paths {
         };
         /**
          * Follower history
-         * @description Follower count per account with one daily snapshot per day between `from` and `to` (UTC days, default the last 30). History starts when Ampost first read the account; a day without a snapshot is missing. Analytics cover Facebook Pages, Instagram, Threads, TikTok, Bluesky, YouTube and Pinterest accounts (on YouTube and Pinterest only posts published through Ampost; LinkedIn once its API access is approved), X accounts that opted in with accounts_set_analytics (Max and Scale; only posts published through Ampost), and Telegram followers (no post metrics). Discord has no analytics: asking for it fails with 422 `ANALYTICS_NOT_AVAILABLE_ON_PLATFORM`. When none of the matching accounts has analytics enabled the call fails with 403 `ANALYTICS_NOT_ENABLED` (its `details.accounts` say why per account). Ampost reads analytics in the background and serves the stored numbers: each account about hourly (daily on the Free plan), a post's metrics hourly in its first 48 hours, every 6 hours up to 14 days and daily up to 90 days. X posts are read daily in their first 3 days and weekly up to 29 days, which costs the plan's X units. Meta itself can lag 24-48 hours. `syncedAt` says when each number was read.
+         * @description Follower count per account with one daily snapshot per day between `from` and `to` (UTC days, default the last 30). History starts when Ampost first read the account; a day without a snapshot is missing. Use it to chart follower growth; for the start, end and change of a range in one number per account use analytics_overview, and for post metrics analytics_posts. Filter by `platform`, `platformSetId` or `accountId`; paginated by account with `limit` and `offset`. A range longer than 90 days or with `from` after `to` is 400 VALIDATION_FAILED. Analytics cover Facebook Pages, Instagram, Threads, TikTok, Bluesky, YouTube and Pinterest accounts (on YouTube and Pinterest only posts published through Ampost; LinkedIn once its API access is approved), X accounts that opted in with accounts_set_analytics (Max and Scale; only posts published through Ampost), and Telegram followers (no post metrics). Discord has no analytics: asking for it fails with 422 `ANALYTICS_NOT_AVAILABLE_ON_PLATFORM`. When none of the matching accounts has analytics enabled the call fails with 403 `ANALYTICS_NOT_ENABLED` (its `details.accounts` say why per account). Ampost reads analytics in the background and serves the stored numbers: each account about hourly (daily on the Free plan), a post's metrics hourly in its first 48 hours, every 6 hours up to 14 days and daily up to 90 days. X posts are read daily in their first 3 days and weekly up to 29 days, which costs the plan's X units. Meta itself can lag 24-48 hours. `syncedAt` says when each number was read.
          *
          *     MCP tool: `analytics_followers`. Key scope: `analytics:read`.
          */
@@ -608,7 +608,7 @@ export interface paths {
         };
         /**
          * List webhooks
-         * @description List your webhooks, oldest first. Secrets show only as `secretPreview`. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
+         * @description List your webhooks, oldest first: each with its `url`, `events`, `enabled` state, failure count and `secretPreview` (the full secret is shown only by webhooks_create and a rotate). Use it to find a webhook id or check which events go where; use webhooks_get for one webhook you have the id of, and webhooks_deliveries_list for what was sent. Paginated with `limit` and `offset`. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
          *
          *     MCP tool: `webhooks_list`. Key scope: `webhooks:write`.
          */
@@ -636,7 +636,7 @@ export interface paths {
         };
         /**
          * Get a webhook
-         * @description Get one webhook with its status and failure count. The secret shows only as `secretPreview`. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
+         * @description Get one webhook by id with its `url`, `events`, `enabled` state, `disabledReason` and failure count. The secret shows only as `secretPreview`. Use it to check why a webhook stopped; use webhooks_list to find webhooks, and webhooks_deliveries_list for the delivery log. 404 WEBHOOK_NOT_FOUND for an id that is not yours. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
          *
          *     MCP tool: `webhooks_get`. Key scope: `webhooks:write`.
          */
@@ -645,7 +645,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a webhook
-         * @description Delete a webhook and its delivery log. Pending deliveries are not sent.
+         * @description Delete a webhook and its delivery log for good. Pending deliveries are not sent. To pause it instead, use webhooks_update with `enabled: false`. 404 WEBHOOK_NOT_FOUND for an id that is not yours. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
          *
          *     MCP tool: `webhooks_delete`. Key scope: `webhooks:write`.
          */
@@ -672,7 +672,7 @@ export interface paths {
         put?: never;
         /**
          * Send a test event
-         * @description Send a signed `webhook.test` event to the webhook now, also when it is turned off, and return the delivery with your URL's response. One attempt, no retries.
+         * @description Send a signed `webhook.test` event to the webhook now, also when it is turned off, and return the delivery with your URL's response (status code and body). One attempt, no retries. Use it to check the URL and signature handling; to resend a real past event, use webhooks_redeliver. 404 WEBHOOK_NOT_FOUND for an id that is not yours. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
          *
          *     MCP tool: `webhooks_test`. Key scope: `webhooks:write`.
          */
@@ -692,7 +692,7 @@ export interface paths {
         };
         /**
          * List webhook deliveries
-         * @description The webhook's delivery log, newest first: each event sent, its status, attempts, and the last response code and body. Kept for 30 days.
+         * @description The webhook's delivery log, newest first: each event sent, its status, attempts, and the last response code and body. Kept for 30 days. Use it to see what failed and why, then resend a delivery with webhooks_redeliver and its `id`. Paginated with `limit` and `offset`. 404 WEBHOOK_NOT_FOUND for an id that is not yours. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
          *
          *     MCP tool: `webhooks_deliveries_list`. Key scope: `webhooks:write`.
          */
@@ -716,7 +716,7 @@ export interface paths {
         put?: never;
         /**
          * Redeliver an event
-         * @description Send a past delivery's event again now, with the same event id and body, as a new delivery (one attempt, also when the webhook is turned off). Returns the new delivery with your URL's response.
+         * @description Send a past delivery's event again now, with the same event id and body, as a new delivery (one attempt, also when the webhook is turned off). Returns the new delivery with your URL's response. Use it for events a failed or turned-off webhook missed (from webhooks_deliveries_list); for a synthetic test event use webhooks_test. 404 WEBHOOK_NOT_FOUND or DELIVERY_NOT_FOUND for ids that are not yours. Webhooks see every platform set, so keys restricted to some sets get 403 PLATFORM_SET_NOT_ALLOWED.
          *
          *     MCP tool: `webhooks_redeliver`. Key scope: `webhooks:write`.
          */
@@ -823,20 +823,35 @@ export interface components {
             thumbnailUrl?: string | null;
         };
         ThreadItemInput: {
-            /** @default  */
+            /**
+             * @description Item text. Default empty.
+             * @default
+             */
             text?: string;
-            /** @default [] */
+            /**
+             * @description Item media. Default none.
+             * @default []
+             */
             media?: {
-                /** Format: uri */
+                /**
+                 * Format: uri
+                 * @description Public https URL
+                 */
                 url: string;
-                /** @enum {string} */
+                /**
+                 * @description Media kind
+                 * @enum {string}
+                 */
                 type: "image" | "video";
+                /** @description Alt text */
                 altText?: string;
             }[];
         };
         /** @description Needs a title, description, image or fields; all embeds together at most 6000 characters. */
         DiscordEmbed: {
+            /** @description Embed title. */
             title?: string;
+            /** @description Embed text. */
             description?: string;
             /**
              * Format: uri
@@ -850,22 +865,30 @@ export interface components {
              * @description Image under the embed (Discord fetches it).
              */
             imageUrl?: string;
+            /** @description Name and value pairs. */
             fields?: {
+                /** @description Field name. */
                 name: string;
+                /** @description Field text. */
                 value: string;
+                /** @description Side by side with other inline fields. */
                 inline?: boolean;
             }[];
         };
         /** @description A poll; it cannot be edited later. */
         DiscordPoll: {
+            /** @description Poll question. */
             question: string;
+            /** @description Answer texts. */
             answers: string[];
             /** @description Default 24. */
             durationHours?: number;
+            /** @description Allow several answers. Default false. */
             allowMultiselect?: boolean;
         };
         /** @description Per-platform options keyed by platform. Every platform accepts `text`, the platforms that take a first comment accept `firstComment` and the ones that take a thread (X, Bluesky, Threads) accept `thread`; see GET /api/platforms for the rest. */
         PostOptions: {
+            /** @description Instagram options. */
             instagram?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -882,8 +905,11 @@ export interface components {
                 userTags?: {
                     /** @description Username, without @ */
                     username: string;
+                    /** @description From the left, 0-1. */
                     x?: number;
+                    /** @description From the top, 0-1. */
                     y?: number;
+                    /** @description Media item, 0-based. Default 0. */
                     mediaIndex?: number;
                 }[];
                 /**
@@ -896,6 +922,7 @@ export interface components {
                 /** @description Reels: also show in the feed grid. Default true. */
                 shareToFeed?: boolean;
             };
+            /** @description Facebook options. */
             facebook?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -907,6 +934,7 @@ export interface components {
                  */
                 placement?: "feed" | "story" | "reel";
             };
+            /** @description LinkedIn options. */
             linkedin?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -926,6 +954,7 @@ export interface components {
                 /** @description Video title. Requires a video. */
                 videoTitle?: string;
             };
+            /** @description TikTok options. */
             tiktok?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -957,6 +986,7 @@ export interface components {
                 /** @description Send to the creator's TikTok inbox as a draft instead; they post it in the TikTok app. The account is `published` once it is in the inbox (with a warning); no privacy or consent needed. A video draft has no caption. */
                 inboxDraft?: boolean;
             };
+            /** @description Threads options. */
             threads?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -965,6 +995,7 @@ export interface components {
                 /** @description This platform's thread instead of `thread`; `[]` for none. */
                 thread?: components["schemas"]["ThreadItemInput"][];
             };
+            /** @description X options. */
             twitter?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -973,6 +1004,7 @@ export interface components {
                 /** @description This platform's thread instead of `thread`; `[]` for none. */
                 thread?: components["schemas"]["ThreadItemInput"][];
             };
+            /** @description Discord options. */
             discord?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -989,6 +1021,7 @@ export interface components {
                 threadName?: string;
                 poll?: components["schemas"]["DiscordPoll"];
             };
+            /** @description Telegram options. */
             telegram?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1001,10 +1034,12 @@ export interface components {
                 disableNotification?: boolean;
                 /** @description No forwarding or saving. */
                 protectContent?: boolean;
+                /** @description No link preview. */
                 disableLinkPreview?: boolean;
                 /** @description Send media as files, not recompressed. */
                 sendAsDocument?: boolean;
             };
+            /** @description Bluesky options. */
             bluesky?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1013,6 +1048,7 @@ export interface components {
                 /** @description This platform's thread instead of `thread`; `[]` for none. */
                 thread?: components["schemas"]["ThreadItemInput"][];
             };
+            /** @description YouTube options. */
             youtube?: {
                 /** @description Video description for YouTube instead of the post's `text`. */
                 text?: string;
@@ -1038,6 +1074,7 @@ export interface components {
                 /** @description The video has realistic altered or synthetic (AI-generated) content. */
                 containsSyntheticMedia?: boolean;
             };
+            /** @description Pinterest options. */
             pinterest?: {
                 /** @description Pin description for Pinterest instead of the post's `text`. */
                 text?: string;
@@ -1049,6 +1086,7 @@ export interface components {
         };
         /** @description Per-platform options to change. Each platform key you send replaces that platform's options as a whole (send every field you want to keep, e.g. both `text` and `placement`); `null` removes them. Platforms you leave out keep their options. */
         PostOptionsUpdate: {
+            /** @description Instagram options; null removes them. */
             instagram?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1065,8 +1103,11 @@ export interface components {
                 userTags?: {
                     /** @description Username, without @ */
                     username: string;
+                    /** @description From the left, 0-1. */
                     x?: number;
+                    /** @description From the top, 0-1. */
                     y?: number;
+                    /** @description Media item, 0-based. Default 0. */
                     mediaIndex?: number;
                 }[];
                 /**
@@ -1079,6 +1120,7 @@ export interface components {
                 /** @description Reels: also show in the feed grid. Default true. */
                 shareToFeed?: boolean;
             } | null;
+            /** @description Facebook options; null removes them. */
             facebook?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1090,6 +1132,7 @@ export interface components {
                  */
                 placement?: "feed" | "story" | "reel";
             } | null;
+            /** @description LinkedIn options; null removes them. */
             linkedin?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1109,6 +1152,7 @@ export interface components {
                 /** @description Video title. Requires a video. */
                 videoTitle?: string;
             } | null;
+            /** @description TikTok options; null removes them. */
             tiktok?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1140,6 +1184,7 @@ export interface components {
                 /** @description Send to the creator's TikTok inbox as a draft instead; they post it in the TikTok app. The account is `published` once it is in the inbox (with a warning); no privacy or consent needed. A video draft has no caption. */
                 inboxDraft?: boolean;
             } | null;
+            /** @description Threads options; null removes them. */
             threads?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1148,6 +1193,7 @@ export interface components {
                 /** @description This platform's thread instead of `thread`; `[]` for none. */
                 thread?: components["schemas"]["ThreadItemInput"][];
             } | null;
+            /** @description X options; null removes them. */
             twitter?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1156,6 +1202,7 @@ export interface components {
                 /** @description This platform's thread instead of `thread`; `[]` for none. */
                 thread?: components["schemas"]["ThreadItemInput"][];
             } | null;
+            /** @description Discord options; null removes them. */
             discord?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1172,6 +1219,7 @@ export interface components {
                 threadName?: string;
                 poll?: components["schemas"]["DiscordPoll"];
             } | null;
+            /** @description Telegram options; null removes them. */
             telegram?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1184,10 +1232,12 @@ export interface components {
                 disableNotification?: boolean;
                 /** @description No forwarding or saving. */
                 protectContent?: boolean;
+                /** @description No link preview. */
                 disableLinkPreview?: boolean;
                 /** @description Send media as files, not recompressed. */
                 sendAsDocument?: boolean;
             } | null;
+            /** @description Bluesky options; null removes them. */
             bluesky?: {
                 /** @description Text for this platform instead of the post's `text`. */
                 text?: string;
@@ -1196,6 +1246,7 @@ export interface components {
                 /** @description This platform's thread instead of `thread`; `[]` for none. */
                 thread?: components["schemas"]["ThreadItemInput"][];
             } | null;
+            /** @description YouTube options; null removes them. */
             youtube?: {
                 /** @description Video description for YouTube instead of the post's `text`. */
                 text?: string;
@@ -1221,6 +1272,7 @@ export interface components {
                 /** @description The video has realistic altered or synthetic (AI-generated) content. */
                 containsSyntheticMedia?: boolean;
             } | null;
+            /** @description Pinterest options; null removes them. */
             pinterest?: {
                 /** @description Pin description for Pinterest instead of the post's `text`. */
                 text?: string;
@@ -2633,12 +2685,12 @@ export interface operations {
     posts_list: {
         parameters: {
             query?: {
-                /** @description Only posts with this status: `draft`, `scheduled`, `queued`, `posting`, `published`, `partial`, `failed`, `discarded`, `deleted` */
+                /** @description Only posts with this status: `draft`, `scheduled`, `queued`, `posting`, `published`, `partial`, `failed`, `discarded`, `deleted`. Default: every status. */
                 status?: "draft" | "scheduled" | "queued" | "posting" | "published" | "partial" | "failed" | "discarded" | "deleted";
-                /** @description Only posts with an account on this platform */
+                /** @description Only posts with an account on this platform. Default: every platform. */
                 platform?: "instagram" | "facebook" | "linkedin" | "tiktok" | "threads" | "twitter" | "discord" | "telegram" | "bluesky" | "youtube" | "pinterest";
                 platformSetId?: string;
-                /** @description Case-insensitive match on the post text */
+                /** @description Only posts whose main text contains this, case-insensitive, e.g. `launch` */
                 search?: string;
                 /** @description Page size, 1-100. Default 20. */
                 limit?: number;
@@ -2967,7 +3019,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Post id */
+                /** @description Post id (UUID): `id` from posts_list or posts_create */
                 postId: string;
             };
             cookie?: never;
@@ -3034,7 +3086,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Post id */
+                /** @description Post id (UUID): `id` from posts_list or posts_create */
                 postId: string;
             };
             cookie?: never;
@@ -3101,7 +3153,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Post id */
+                /** @description Post id (UUID): `id` from posts_list or posts_create */
                 postId: string;
             };
             cookie?: never;
@@ -3175,7 +3227,7 @@ export interface operations {
                 "Idempotency-Key"?: string;
             };
             path: {
-                /** @description Post id */
+                /** @description Post id (UUID): `id` from posts_list or posts_create */
                 postId: string;
             };
             cookie?: never;
@@ -3244,7 +3296,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Post id */
+                /** @description Post id (UUID): `id` from posts_list or posts_create */
                 postId: string;
             };
             cookie?: never;
@@ -3315,7 +3367,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Post id */
+                /** @description Post id (UUID): `id` from posts_list or posts_create */
                 postId: string;
             };
             cookie?: never;
@@ -3389,7 +3441,7 @@ export interface operations {
                 "Idempotency-Key"?: string;
             };
             path: {
-                /** @description Post id */
+                /** @description Post id (UUID): `id` from posts_list or posts_create */
                 postId: string;
             };
             cookie?: never;
@@ -3530,7 +3582,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Media upload id */
+                /** @description Media upload id (UUID): `id` from media_upload_create */
                 uploadId: string;
             };
             cookie?: never;
@@ -3595,7 +3647,7 @@ export interface operations {
     accounts_list: {
         parameters: {
             query?: {
-                /** @description Only accounts on this platform */
+                /** @description Only accounts on this platform. Default: every platform. */
                 platform?: "instagram" | "facebook" | "linkedin" | "tiktok" | "threads" | "twitter" | "discord" | "telegram" | "bluesky" | "youtube" | "pinterest";
                 platformSetId?: string;
                 /** @description `active` (default): accounts that can publish. `revoked`: disconnected accounts. `all`: both. */
@@ -3671,7 +3723,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Account id */
+                /** @description Account id (UUID): `id` from accounts_list */
                 accountId: string;
             };
             cookie?: never;
@@ -3738,7 +3790,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Account id */
+                /** @description Account id (UUID): `id` from accounts_list */
                 accountId: string;
             };
             cookie?: never;
@@ -3805,7 +3857,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Account id */
+                /** @description Account id (UUID): `id` from accounts_list */
                 accountId: string;
             };
             cookie?: never;
@@ -3876,7 +3928,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Account id */
+                /** @description Account id (UUID): `id` from accounts_list */
                 accountId: string;
             };
             cookie?: never;
@@ -3943,7 +3995,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Account id */
+                /** @description Account id (UUID): `id` from accounts_list */
                 accountId: string;
             };
             cookie?: never;
@@ -4087,7 +4139,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Connection request id */
+                /** @description Connection request id (UUID): `id` from accounts_connect */
                 connectRequestId: string;
             };
             cookie?: never;
@@ -4296,7 +4348,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Platform set id */
+                /** @description Platform set id (UUID): `id` from platform_sets_list */
                 platformSetId: string;
             };
             cookie?: never;
@@ -4363,7 +4415,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Platform set id */
+                /** @description Platform set id (UUID): `id` from platform_sets_list */
                 platformSetId: string;
             };
             cookie?: never;
@@ -4430,7 +4482,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Platform set id */
+                /** @description Platform set id (UUID): `id` from platform_sets_list */
                 platformSetId: string;
             };
             cookie?: never;
@@ -4501,7 +4553,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Platform set id */
+                /** @description Platform set id (UUID): `id` from platform_sets_list */
                 platformSetId: string;
             };
             cookie?: never;
@@ -4568,7 +4620,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Platform set id */
+                /** @description Platform set id (UUID): `id` from platform_sets_list */
                 platformSetId: string;
             };
             cookie?: never;
@@ -4644,7 +4696,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description Platform set id */
+                /** @description Platform set id (UUID): `id` from platform_sets_list */
                 platformSetId: string;
             };
             cookie?: never;
@@ -4709,13 +4761,13 @@ export interface operations {
     analytics_posts: {
         parameters: {
             query?: {
-                /** @description Only this post */
+                /** @description Only this post (`id` from posts_list). Default: every published post. */
                 postId?: string;
-                /** @description Only accounts on this platform */
+                /** @description Only accounts on this platform. Default: every platform with analytics. */
                 platform?: "instagram" | "facebook" | "linkedin" | "tiktok" | "threads" | "twitter" | "discord" | "telegram" | "bluesky" | "youtube" | "pinterest";
-                /** @description Only accounts in this platform set */
+                /** @description Only accounts in this platform set (`id` from platform_sets_list). Default: every set the key can see. */
                 platformSetId?: string;
-                /** @description Only this account */
+                /** @description Only this account (`id` from accounts_list). Default: every matching account. */
                 accountId?: string;
                 /** @description Page size, 1-100. Default 20. */
                 limit?: number;
@@ -4790,11 +4842,11 @@ export interface operations {
                 from?: string;
                 /** @description Last day (UTC), YYYY-MM-DD, included. Default: today. */
                 to?: string;
-                /** @description Only accounts on this platform */
+                /** @description Only accounts on this platform. Default: every platform with analytics. */
                 platform?: "instagram" | "facebook" | "linkedin" | "tiktok" | "threads" | "twitter" | "discord" | "telegram" | "bluesky" | "youtube" | "pinterest";
-                /** @description Only accounts in this platform set */
+                /** @description Only accounts in this platform set (`id` from platform_sets_list). Default: every set the key can see. */
                 platformSetId?: string;
-                /** @description Only this account */
+                /** @description Only this account (`id` from accounts_list). Default: every matching account. */
                 accountId?: string;
             };
             header?: never;
@@ -4865,11 +4917,11 @@ export interface operations {
                 from?: string;
                 /** @description Last day (UTC), YYYY-MM-DD, included. Default: today. */
                 to?: string;
-                /** @description Only accounts on this platform */
+                /** @description Only accounts on this platform. Default: every platform with analytics. */
                 platform?: "instagram" | "facebook" | "linkedin" | "tiktok" | "threads" | "twitter" | "discord" | "telegram" | "bluesky" | "youtube" | "pinterest";
-                /** @description Only accounts in this platform set */
+                /** @description Only accounts in this platform set (`id` from platform_sets_list). Default: every set the key can see. */
                 platformSetId?: string;
-                /** @description Only this account */
+                /** @description Only this account (`id` from accounts_list). Default: every matching account. */
                 accountId?: string;
                 /** @description Page size, 1-100. Default 20. */
                 limit?: number;
@@ -5084,7 +5136,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Webhook id */
+                /** @description Webhook id (UUID): `id` from webhooks_list or webhooks_create */
                 webhookId: string;
             };
             cookie?: never;
@@ -5151,7 +5203,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Webhook id */
+                /** @description Webhook id (UUID): `id` from webhooks_list or webhooks_create */
                 webhookId: string;
             };
             cookie?: never;
@@ -5218,7 +5270,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Webhook id */
+                /** @description Webhook id (UUID): `id` from webhooks_list or webhooks_create */
                 webhookId: string;
             };
             cookie?: never;
@@ -5289,7 +5341,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Webhook id */
+                /** @description Webhook id (UUID): `id` from webhooks_list or webhooks_create */
                 webhookId: string;
             };
             cookie?: never;
@@ -5361,7 +5413,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description Webhook id */
+                /** @description Webhook id (UUID): `id` from webhooks_list or webhooks_create */
                 webhookId: string;
             };
             cookie?: never;
@@ -5428,9 +5480,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Webhook id */
+                /** @description Webhook id (UUID): `id` from webhooks_list or webhooks_create */
                 webhookId: string;
-                /** @description Delivery id */
+                /** @description Delivery id (UUID): `id` from webhooks_deliveries_list */
                 deliveryId: string;
             };
             cookie?: never;
@@ -5601,12 +5653,17 @@ export interface operations {
                     };
                     /** @description The dashboard's last API calls; the dashboard fills it in */
                     recentRequests?: {
+                        /** @description HTTP method */
                         method: string;
+                        /** @description API path */
                         path: string;
                         /** @description Null when the request got no response */
                         status: number | null;
+                        /** @description The `X-Request-Id` of the response, or null */
                         requestId: string | null;
+                        /** @description `error.code`, or null */
                         errorCode: string | null;
+                        /** @description `error.message`, or null */
                         errorMessage: string | null;
                         /**
                          * Format: date-time
