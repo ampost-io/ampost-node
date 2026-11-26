@@ -2162,7 +2162,7 @@ export interface components {
             platform: "instagram" | "facebook" | "linkedin" | "tiktok" | "threads" | "twitter" | "discord" | "telegram" | "bluesky" | "youtube" | "pinterest";
             platformSetId: string | null;
             /**
-             * @description `not_available_on_platform`: the platform has no analytics (Discord); Facebook, Instagram, Threads, TikTok, LinkedIn, Bluesky, X, YouTube, Pinterest and Telegram have them. `opt_in_required`: an X account whose analytics are off; X reads cost X units, turn them on with accounts_set_analytics. `platform_disabled`: LinkedIn, until Ampost's LinkedIn app is approved for the Community Management API. `page_not_selected`: the Facebook Page connection predates Page selection; reconnect it. `account_inactive`: the account is disconnected.
+             * @description `not_available_on_platform`: the platform has no analytics (Discord); Facebook, Instagram, Threads, TikTok (coming soon), Bluesky, X, YouTube, Pinterest and Telegram have them. `opt_in_required`: an X account whose analytics are off; X reads cost X units, turn them on with accounts_set_analytics. `platform_disabled`: LinkedIn, which is coming soon to Ampost. `page_not_selected`: the Facebook Page connection predates Page selection; reconnect it. `account_inactive`: the account is disconnected.
              * @enum {string}
              */
             reason: "not_available_on_platform" | "opt_in_required" | "platform_disabled" | "page_not_selected" | "account_inactive";
@@ -2650,6 +2650,74 @@ export interface operations {
                     "application/json": components["schemas"]["PlatformList"];
                 };
             };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
             429: {
                 headers: {
@@ -2666,6 +2734,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -2723,7 +2807,97 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [],
+                     *       "pagination": {
+                     *         "limit": 20,
+                     *         "offset": 0,
+                     *         "total": 0,
+                     *         "hasMore": false
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["PostList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -2742,6 +2916,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -2770,6 +2960,44 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "targets": [
+                 *         {
+                 *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                 *           "platforms": [
+                 *             "instagram",
+                 *             "facebook"
+                 *           ]
+                 *         }
+                 *       ],
+                 *       "text": "Launch day: Ampost publishes everywhere from one API.",
+                 *       "firstComment": "Pricing and docs: https://ampost.io",
+                 *       "media": [
+                 *         {
+                 *           "url": "https://cdn.example.com/launch.mp4",
+                 *           "type": "video",
+                 *           "mimeType": "video/mp4",
+                 *           "sizeBytes": 18200000,
+                 *           "width": 1080,
+                 *           "height": 1920,
+                 *           "durationSeconds": 21
+                 *         }
+                 *       ],
+                 *       "options": {
+                 *         "instagram": {
+                 *           "placement": "reel"
+                 *         },
+                 *         "facebook": {
+                 *           "text": "Launch day. Here is what we built and why."
+                 *         }
+                 *       },
+                 *       "publishNow": true,
+                 *       "metadata": {
+                 *         "campaignId": "launch-2026"
+                 *       }
+                 *     }
+                 */
                 "application/json": components["schemas"]["CreatePostRequest"];
                 /** @description File uploads. The whole request must be at most 4 MB (413 `PAYLOAD_TOO_LARGE`); send larger files with a media upload (`POST /api/media/uploads`). */
                 "multipart/form-data": {
@@ -2803,7 +3031,205 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "published",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "instagram",
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "instagram",
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Launch day: Ampost publishes everywhere from one API.",
+                     *       "firstComment": "Pricing and docs: https://ampost.io",
+                     *       "linkUrl": null,
+                     *       "media": [
+                     *         {
+                     *           "url": "https://cdn.example.com/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18200000,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 21,
+                     *           "altText": null,
+                     *           "thumbnailUrl": null
+                     *         }
+                     *       ],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {
+                     *         "instagram": {
+                     *           "placement": "reel"
+                     *         },
+                     *         "facebook": {
+                     *           "text": "Launch day. Here is what we built and why."
+                     *         }
+                     *       },
+                     *       "scheduledFor": null,
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": {
+                     *         "campaignId": "launch-2026"
+                     *       },
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "17895695668004550",
+                     *           "publishedUrl": "https://www.instagram.com/reel/C9xYz12AbCd/",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": {
+                     *             "status": "published",
+                     *             "commentId": "17858893269123456",
+                     *             "error": null,
+                     *             "reason": null,
+                     *             "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *           },
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *         },
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "108234567890123_901234567890125",
+                     *           "publishedUrl": "https://www.facebook.com/108234567890123/posts/901234567890125",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": {
+                     *             "status": "failed",
+                     *             "commentId": null,
+                     *             "error": {
+                     *               "code": "PLATFORM_ERROR",
+                     *               "message": "Facebook comment failed: the service is temporarily unavailable",
+                     *               "retryable": true,
+                     *               "platformCode": null,
+                     *               "platformSubcode": null
+                     *             },
+                     *             "reason": null,
+                     *             "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *           },
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`, `CONTENT_TOO_LONG`, `UNSUPPORTED_MEDIA_TYPE`, `UNSUPPORTED_MEDIA_CONFIG`, `MIXED_MEDIA_NOT_SUPPORTED`, `INVALID_PLACEMENT`, `MEDIA_FETCH_FAILED`, `PLATFORM_NOT_CONNECTED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `SCHEDULED_POSTS_LIMIT_REACHED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`, `QUEUE_EMPTY`, `QUEUE_FULL`, `QUEUE_SLOT_TAKEN`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description The request body is over 4 MB: `PAYLOAD_TOO_LARGE`. A body over 4.5 MB never reaches Ampost: the hosting edge answers a plain-text 413 `FUNCTION_PAYLOAD_TOO_LARGE`. */
@@ -2833,6 +3259,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -2858,6 +3300,37 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "targets": [
+                 *         {
+                 *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                 *           "platforms": [
+                 *             "instagram",
+                 *             "twitter"
+                 *           ]
+                 *         }
+                 *       ],
+                 *       "text": "Our new office, finally.",
+                 *       "media": [
+                 *         {
+                 *           "url": "https://cdn.example.com/office.png",
+                 *           "type": "image",
+                 *           "mimeType": "image/png",
+                 *           "sizeBytes": 9400000,
+                 *           "width": 4000,
+                 *           "height": 3000,
+                 *           "altText": "The team at their desks"
+                 *         }
+                 *       ],
+                 *       "thread": [
+                 *         {
+                 *           "text": "Moving day photos in the replies."
+                 *         }
+                 *       ],
+                 *       "scheduledFor": "2027-03-02T09:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["CreatePostRequest"];
             };
         };
@@ -2882,7 +3355,124 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "valid": false,
+                     *       "errors": [],
+                     *       "warnings": [],
+                     *       "scheduledFor": "2027-03-02T09:00:00Z",
+                     *       "targets": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "valid": false,
+                     *           "errors": [
+                     *             {
+                     *               "code": "VALIDATION_FAILED",
+                     *               "message": "\"instagram\" takes no thread; only X, Bluesky and Threads do. For a post that also goes to \"instagram\", set the thread in options.<platform>.thread of those platforms instead of thread",
+                     *               "details": {
+                     *                 "platform": "instagram",
+                     *                 "field": "thread"
+                     *               }
+                     *             }
+                     *           ],
+                     *           "warnings": [],
+                     *           "mediaConversion": []
+                     *         },
+                     *         {
+                     *           "platform": "twitter",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "accountId": "9a4e2c7b-3d1f-4b8a-9c6e-5f2a8d1b7c40",
+                     *           "valid": true,
+                     *           "errors": [],
+                     *           "warnings": [],
+                     *           "mediaConversion": [
+                     *             {
+                     *               "mediaIndex": 0,
+                     *               "status": "convert",
+                     *               "operations": [
+                     *                 "compress"
+                     *               ],
+                     *               "changes": [
+                     *                 "9.0 MB → at most 5.0 MB"
+                     *               ],
+                     *               "final": true
+                     *             }
+                     *           ]
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": components["schemas"]["PostValidation"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -2901,6 +3491,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -2929,6 +3535,12 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "csv": "text,platforms,scheduledFor,useQueue,media,text_threads\nLaunch day,bluesky threads,2027-01-20T09:00:00Z,,https://cdn.example.com/launch.jpg,Shorter for Threads\nBehind the scenes,instagram,,true,https://cdn.example.com/team.mp4,\nDraft for later,myspace,,,,",
+                 *       "dryRun": true
+                 *     }
+                 */
                 "application/json": components["schemas"]["ImportPostsCsvRequest"];
                 /** @description The CSV as a file upload. The whole request must be at most 4 MB (413 `PAYLOAD_TOO_LARGE`). */
                 "multipart/form-data": {
@@ -2968,7 +3580,135 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "dryRun": true,
+                     *       "summary": {
+                     *         "rows": 3,
+                     *         "valid": 2,
+                     *         "created": 0,
+                     *         "errors": 1
+                     *       },
+                     *       "warnings": [],
+                     *       "rows": [
+                     *         {
+                     *           "row": 2,
+                     *           "status": "valid",
+                     *           "postId": null,
+                     *           "scheduledFor": "2027-01-20T09:00:00Z",
+                     *           "errors": []
+                     *         },
+                     *         {
+                     *           "row": 3,
+                     *           "status": "valid",
+                     *           "postId": null,
+                     *           "scheduledFor": "2027-01-13T11:30:00.000Z",
+                     *           "errors": []
+                     *         },
+                     *         {
+                     *           "row": 4,
+                     *           "status": "error",
+                     *           "postId": null,
+                     *           "scheduledFor": null,
+                     *           "errors": [
+                     *             {
+                     *               "code": "VALIDATION_FAILED",
+                     *               "message": "Invalid option: expected one of \"instagram\"|\"facebook\"|\"linkedin\"|\"tiktok\"|\"threads\"|\"twitter\"|\"discord\"|\"telegram\"|\"bluesky\"|\"youtube\"|\"pinterest\"",
+                     *               "column": "platforms"
+                     *             }
+                     *           ]
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": components["schemas"]["ImportPostsCsvResult"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`, `CONTENT_TOO_LONG`, `UNSUPPORTED_MEDIA_TYPE`, `UNSUPPORTED_MEDIA_CONFIG`, `MIXED_MEDIA_NOT_SUPPORTED`, `INVALID_PLACEMENT`, `MEDIA_FETCH_FAILED`, `PLATFORM_NOT_CONNECTED`, `TOO_MANY_ROWS`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `SCHEDULED_POSTS_LIMIT_REACHED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`, `QUEUE_EMPTY`, `QUEUE_FULL`, `QUEUE_SLOT_TAKEN`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description The request body is over 4 MB: `PAYLOAD_TOO_LARGE`. A body over 4.5 MB never reaches Ampost: the hosting edge answers a plain-text 413 `FUNCTION_PAYLOAD_TOO_LARGE`. */
@@ -2998,6 +3738,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3046,7 +3802,205 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "published",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "instagram",
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "instagram",
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Launch day: Ampost publishes everywhere from one API.",
+                     *       "firstComment": "Pricing and docs: https://ampost.io",
+                     *       "linkUrl": null,
+                     *       "media": [
+                     *         {
+                     *           "url": "https://cdn.example.com/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18200000,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 21,
+                     *           "altText": null,
+                     *           "thumbnailUrl": null
+                     *         }
+                     *       ],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {
+                     *         "instagram": {
+                     *           "placement": "reel"
+                     *         },
+                     *         "facebook": {
+                     *           "text": "Launch day. Here is what we built and why."
+                     *         }
+                     *       },
+                     *       "scheduledFor": null,
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": {
+                     *         "campaignId": "launch-2026"
+                     *       },
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "17895695668004550",
+                     *           "publishedUrl": "https://www.instagram.com/reel/C9xYz12AbCd/",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": {
+                     *             "status": "published",
+                     *             "commentId": "17858893269123456",
+                     *             "error": null,
+                     *             "reason": null,
+                     *             "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *           },
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *         },
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "108234567890123_901234567890125",
+                     *           "publishedUrl": "https://www.facebook.com/108234567890123/posts/901234567890125",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": {
+                     *             "status": "failed",
+                     *             "commentId": null,
+                     *             "error": {
+                     *               "code": "PLATFORM_ERROR",
+                     *               "message": "Facebook comment failed: the service is temporarily unavailable",
+                     *               "retryable": true,
+                     *               "platformCode": null,
+                     *               "platformSubcode": null
+                     *             },
+                     *             "reason": null,
+                     *             "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *           },
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3065,6 +4019,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3113,7 +4083,156 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "discarded",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Webinar starts in one hour.",
+                     *       "firstComment": null,
+                     *       "linkUrl": "https://example.com/webinar",
+                     *       "media": [],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {},
+                     *       "scheduledFor": "2027-01-12T08:00:00.000Z",
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": null,
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "cancelled",
+                     *           "platformPostId": null,
+                     *           "publishedUrl": null,
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 0,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-07T12:00:00.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-07T12:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INVALID_STATUS_TRANSITION`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3132,6 +4251,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3160,6 +4295,12 @@ export interface operations {
         };
         requestBody?: {
             content: {
+                /**
+                 * @example {
+                 *       "text": "Launch day (updated): Ampost publishes everywhere from one API.",
+                 *       "scheduledFor": "2027-01-12T08:00:00Z"
+                 *     }
+                 */
                 "application/json": components["schemas"]["UpdatePostRequest"];
             };
         };
@@ -3184,7 +4325,198 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "scheduled",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "instagram",
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "instagram",
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Launch day (updated): Ampost publishes everywhere from one API.",
+                     *       "firstComment": "Pricing and docs: https://ampost.io",
+                     *       "linkUrl": null,
+                     *       "media": [
+                     *         {
+                     *           "url": "https://cdn.example.com/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18200000,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 21,
+                     *           "altText": null,
+                     *           "thumbnailUrl": null
+                     *         }
+                     *       ],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {
+                     *         "instagram": {
+                     *           "placement": "reel"
+                     *         },
+                     *         "facebook": {
+                     *           "text": "Launch day. Here is what we built and why."
+                     *         }
+                     *       },
+                     *       "scheduledFor": "2027-01-12T08:00:00.000Z",
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": {
+                     *         "campaignId": "launch-2026"
+                     *       },
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "pending",
+                     *           "platformPostId": null,
+                     *           "publishedUrl": null,
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 0,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-07T12:00:00.000Z"
+                     *         },
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "pending",
+                     *           "platformPostId": null,
+                     *           "publishedUrl": null,
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 0,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-07T12:00:00.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-07T12:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`, `CONTENT_TOO_LONG`, `UNSUPPORTED_MEDIA_TYPE`, `UNSUPPORTED_MEDIA_CONFIG`, `MIXED_MEDIA_NOT_SUPPORTED`, `INVALID_PLACEMENT`, `MEDIA_FETCH_FAILED`, `PLATFORM_NOT_CONNECTED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `SCHEDULED_POSTS_LIMIT_REACHED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INVALID_STATUS_TRANSITION`, `QUEUE_EMPTY`, `QUEUE_FULL`, `QUEUE_SLOT_TAKEN`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3203,6 +4535,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3256,7 +4604,224 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "published",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "instagram",
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "instagram",
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Launch day: Ampost publishes everywhere from one API.",
+                     *       "firstComment": "Pricing and docs: https://ampost.io",
+                     *       "linkUrl": null,
+                     *       "media": [
+                     *         {
+                     *           "url": "https://cdn.example.com/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18200000,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 21,
+                     *           "altText": null,
+                     *           "thumbnailUrl": null
+                     *         }
+                     *       ],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {
+                     *         "instagram": {
+                     *           "placement": "reel"
+                     *         },
+                     *         "facebook": {
+                     *           "text": "Launch day. Here is what we built and why."
+                     *         }
+                     *       },
+                     *       "scheduledFor": null,
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": {
+                     *         "campaignId": "launch-2026"
+                     *       },
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "17895695668004550",
+                     *           "publishedUrl": "https://www.instagram.com/reel/C9xYz12AbCd/",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": {
+                     *             "status": "published",
+                     *             "commentId": "17858893269123456",
+                     *             "error": null,
+                     *             "reason": null,
+                     *             "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *           },
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *         },
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "108234567890123_901234567890125",
+                     *           "publishedUrl": "https://www.facebook.com/108234567890123/posts/901234567890125",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": {
+                     *             "status": "failed",
+                     *             "commentId": null,
+                     *             "error": {
+                     *               "code": "PLATFORM_ERROR",
+                     *               "message": "Facebook comment failed: the service is temporarily unavailable",
+                     *               "retryable": true,
+                     *               "platformCode": null,
+                     *               "platformSubcode": null
+                     *             },
+                     *             "reason": null,
+                     *             "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *           },
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INVALID_STATUS_TRANSITION`, `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3275,6 +4840,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3303,6 +4884,14 @@ export interface operations {
         };
         requestBody?: {
             content: {
+                /**
+                 * @example {
+                 *       "accountIds": [
+                 *         "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                 *         "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["UnpublishPostRequest"];
             };
         };
@@ -3327,7 +4916,202 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "published",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "instagram",
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "instagram",
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Launch day: Ampost publishes everywhere from one API.",
+                     *       "firstComment": null,
+                     *       "linkUrl": null,
+                     *       "media": [
+                     *         {
+                     *           "url": "https://cdn.example.com/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18200000,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 21,
+                     *           "altText": null,
+                     *           "thumbnailUrl": null
+                     *         }
+                     *       ],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {
+                     *         "instagram": {
+                     *           "placement": "reel"
+                     *         },
+                     *         "facebook": {
+                     *           "text": "Launch day. Here is what we built and why."
+                     *         }
+                     *       },
+                     *       "scheduledFor": null,
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": null,
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "17895695668004550",
+                     *           "publishedUrl": "https://www.instagram.com/reel/C9xYz12AbCd/",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": {
+                     *             "code": "UNPUBLISH_NOT_SUPPORTED",
+                     *             "message": "This platform has no API to delete a published post. Delete it in the platform's own app.",
+                     *             "retryable": false,
+                     *             "platformCode": null,
+                     *             "platformSubcode": null
+                     *           },
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-07T10:00:01.000Z"
+                     *         },
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "deleted",
+                     *           "platformPostId": "108234567890123_901234567890125",
+                     *           "publishedUrl": null,
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-07T10:00:01.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-07T10:00:01.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INVALID_STATUS_TRANSITION`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3346,6 +5130,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3374,6 +5174,15 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "text": "Launch day. Here is what we built and why (now with the pricing link in the comments).",
+                 *       "accountIds": [
+                 *         "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                 *         "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["EditPublishedPostRequest"];
             };
         };
@@ -3398,7 +5207,202 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "published",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "instagram",
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "instagram",
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Launch day: Ampost publishes everywhere from one API.",
+                     *       "firstComment": null,
+                     *       "linkUrl": null,
+                     *       "media": [
+                     *         {
+                     *           "url": "https://cdn.example.com/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18200000,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 21,
+                     *           "altText": null,
+                     *           "thumbnailUrl": null
+                     *         }
+                     *       ],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {
+                     *         "instagram": {
+                     *           "placement": "reel"
+                     *         },
+                     *         "facebook": {
+                     *           "text": "Launch day. Here is what we built and why."
+                     *         }
+                     *       },
+                     *       "scheduledFor": null,
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": null,
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "17895695668004550",
+                     *           "publishedUrl": "https://www.instagram.com/reel/C9xYz12AbCd/",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": {
+                     *             "code": "EDIT_NOT_SUPPORTED",
+                     *             "message": "This platform has no API to edit a published post. Edit it in the platform's own app.",
+                     *             "retryable": false,
+                     *             "platformCode": null,
+                     *             "platformSubcode": null
+                     *           },
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-07T10:00:01.000Z"
+                     *         },
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "108234567890123_901234567890125",
+                     *           "publishedUrl": "https://www.facebook.com/108234567890123/posts/901234567890125",
+                     *           "text": "Launch day. Here is what we built and why (now with the pricing link in the comments).",
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-07T10:00:01.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-07T10:00:01.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`, `CONTENT_TOO_LONG`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INVALID_STATUS_TRANSITION`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3417,6 +5421,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3448,6 +5468,13 @@ export interface operations {
         };
         requestBody?: {
             content: {
+                /**
+                 * @example {
+                 *       "accountIds": [
+                 *         "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30"
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["RetryPostRequest"];
             };
         };
@@ -3474,7 +5501,201 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *       "status": "published",
+                     *       "targets": [
+                     *         {
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "platforms": [
+                     *             "instagram",
+                     *             "facebook"
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "platforms": [
+                     *         "instagram",
+                     *         "facebook"
+                     *       ],
+                     *       "text": "Launch day: Ampost publishes everywhere from one API.",
+                     *       "firstComment": null,
+                     *       "linkUrl": null,
+                     *       "media": [
+                     *         {
+                     *           "url": "https://cdn.example.com/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18200000,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 21,
+                     *           "altText": null,
+                     *           "thumbnailUrl": null
+                     *         }
+                     *       ],
+                     *       "mediaFit": "pad",
+                     *       "thread": [],
+                     *       "options": {
+                     *         "instagram": {
+                     *           "placement": "reel"
+                     *         }
+                     *       },
+                     *       "scheduledFor": null,
+                     *       "queuePlatformSetId": null,
+                     *       "source": "api",
+                     *       "metadata": null,
+                     *       "platformPosts": [
+                     *         {
+                     *           "platform": "instagram",
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "17895695668004550",
+                     *           "publishedUrl": "https://www.instagram.com/reel/C9xYz12AbCd/",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:04.000Z"
+                     *         },
+                     *         {
+                     *           "platform": "facebook",
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "status": "published",
+                     *           "platformPostId": "108234567890123_901234567890125",
+                     *           "publishedUrl": "https://www.facebook.com/108234567890123/posts/901234567890125",
+                     *           "text": null,
+                     *           "error": null,
+                     *           "notice": null,
+                     *           "warnings": [],
+                     *           "attempts": 1,
+                     *           "nextAttemptAt": null,
+                     *           "firstComment": null,
+                     *           "mediaTransforms": null,
+                     *           "thread": null,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:41:12.000Z"
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:41:12.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Post"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INVALID_STATUS_TRANSITION`, `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3493,6 +5714,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3518,6 +5755,11 @@ export interface operations {
         };
         requestBody?: {
             content: {
+                /**
+                 * @example {
+                 *       "fileName": "launch.mp4"
+                 *     }
+                 */
                 "application/json": components["schemas"]["CreateMediaUploadRequest"];
             };
         };
@@ -3542,7 +5784,105 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "3c7e9a1b-5d2f-4e8a-9b6c-1f3d5a7e9c20",
+                     *       "status": "pending",
+                     *       "uploadPageUrl": "https://ampost.io/upload/3c7e9a1b-5d2f-4e8a-9b6c-1f3d5a7e9c20#token=one-time-token",
+                     *       "uploadUrl": "https://vercel.com/api/blob/?pathname=uploads%2F3c7e9a1b-5d2f-4e8a-9b6c-1f3d5a7e9c20%2Flaunch.mp4",
+                     *       "method": "PUT",
+                     *       "headers": {
+                     *         "authorization": "Bearer vercel_blob_client_...",
+                     *         "x-api-version": "12",
+                     *         "x-vercel-blob-access": "public",
+                     *         "x-add-random-suffix": "0",
+                     *         "x-allow-overwrite": "1"
+                     *       },
+                     *       "limits": {
+                     *         "maxFiles": 35,
+                     *         "maxSizeBytes": 209715200,
+                     *         "mimeTypes": [
+                     *           "image/jpeg",
+                     *           "image/png",
+                     *           "image/webp",
+                     *           "video/mp4",
+                     *           "video/quicktime",
+                     *           "video/webm"
+                     *         ]
+                     *       },
+                     *       "createdAt": "2026-10-06T12:00:00.000Z",
+                     *       "expiresAt": "2026-10-06T13:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["MediaUploadCreated"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3561,6 +5901,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3609,7 +5965,107 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "3c7e9a1b-5d2f-4e8a-9b6c-1f3d5a7e9c20",
+                     *       "status": "completed",
+                     *       "files": [
+                     *         {
+                     *           "url": "https://abc123.public.blob.vercel-storage.com/uploads/3c7e9a1b-5d2f-4e8a-9b6c-1f3d5a7e9c20/launch.mp4",
+                     *           "type": "video",
+                     *           "mimeType": "video/mp4",
+                     *           "sizeBytes": 18350112,
+                     *           "width": 1080,
+                     *           "height": 1920,
+                     *           "durationSeconds": 28
+                     *         }
+                     *       ],
+                     *       "createdAt": "2026-10-06T12:00:00.000Z",
+                     *       "expiresAt": "2026-10-06T13:00:00.000Z",
+                     *       "completedAt": "2026-10-06T12:03:41.000Z",
+                     *       "error": null
+                     *     }
+                     */
                     "application/json": components["schemas"]["MediaUpload"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `MEDIA_UPLOAD_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3628,6 +6084,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3683,7 +6155,97 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [],
+                     *       "pagination": {
+                     *         "limit": 20,
+                     *         "offset": 0,
+                     *         "total": 0,
+                     *         "hasMore": false
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["AccountList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3702,6 +6264,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3750,7 +6328,120 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *       "platform": "instagram",
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "platformAccountId": "17841400000000000",
+                     *       "username": "ampost.io",
+                     *       "avatarUrl": null,
+                     *       "status": "active",
+                     *       "scopes": [
+                     *         "instagram_business_basic",
+                     *         "instagram_business_content_publish"
+                     *       ],
+                     *       "tokenExpiresAt": "2026-12-05T09:00:00.000Z",
+                     *       "tokenHealth": "healthy",
+                     *       "health": {
+                     *         "canPost": true,
+                     *         "needsReconnect": false,
+                     *         "issues": []
+                     *       },
+                     *       "platformMetadata": {
+                     *         "displayName": "Ampost",
+                     *         "accountType": "BUSINESS"
+                     *       },
+                     *       "analytics": {
+                     *         "available": true,
+                     *         "optInRequired": false,
+                     *         "enabled": true
+                     *       },
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:00:00.000Z",
+                     *       "lastUsedAt": "2026-10-06T09:00:04.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Account"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3769,6 +6460,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3817,7 +6524,125 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *       "platform": "instagram",
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "platformAccountId": "17841400000000000",
+                     *       "username": "ampost.io",
+                     *       "avatarUrl": null,
+                     *       "status": "revoked",
+                     *       "scopes": [],
+                     *       "tokenExpiresAt": null,
+                     *       "tokenHealth": "inactive",
+                     *       "health": {
+                     *         "canPost": false,
+                     *         "needsReconnect": true,
+                     *         "issues": [
+                     *           {
+                     *             "code": "ACCOUNT_REVOKED",
+                     *             "severity": "error",
+                     *             "message": "The account is disconnected. Reconnect it with accounts_connect and its accountId."
+                     *           }
+                     *         ]
+                     *       },
+                     *       "platformMetadata": {
+                     *         "displayName": "Ampost",
+                     *         "accountType": "BUSINESS"
+                     *       },
+                     *       "analytics": {
+                     *         "available": true,
+                     *         "optInRequired": false,
+                     *         "enabled": true
+                     *       },
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T12:20:00.000Z",
+                     *       "lastUsedAt": "2026-10-06T09:00:04.000Z",
+                     *       "providerRevoked": false,
+                     *       "providerAccessSettings": "Instagram: Settings > Website permissions > Apps and websites"
+                     *     }
+                     */
                     "application/json": components["schemas"]["DisconnectedAccount"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3836,6 +6661,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3864,6 +6705,11 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "enabled": true
+                 *     }
+                 */
                 "application/json": components["schemas"]["SetAccountAnalyticsRequest"];
             };
         };
@@ -3888,7 +6734,120 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "9a4e2c7b-3d1f-4b8a-9c6e-5f2a8d1b7c40",
+                     *       "platform": "twitter",
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "platformAccountId": "1580000000000000000",
+                     *       "username": "ampost_io",
+                     *       "avatarUrl": null,
+                     *       "status": "active",
+                     *       "scopes": [
+                     *         "tweet.read",
+                     *         "tweet.write",
+                     *         "users.read",
+                     *         "media.write",
+                     *         "offline.access"
+                     *       ],
+                     *       "tokenExpiresAt": "2026-10-07T11:00:00.000Z",
+                     *       "tokenHealth": "healthy",
+                     *       "health": {
+                     *         "canPost": true,
+                     *         "needsReconnect": false,
+                     *         "issues": []
+                     *       },
+                     *       "platformMetadata": {},
+                     *       "analytics": {
+                     *         "available": true,
+                     *         "optInRequired": true,
+                     *         "enabled": true
+                     *       },
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-07T10:00:00.000Z",
+                     *       "lastUsedAt": "2026-10-06T09:00:04.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Account"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3907,6 +6866,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -3955,7 +6930,116 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "id": "813744226420795883",
+                     *           "name": "Product launches",
+                     *           "privacy": "PUBLIC",
+                     *           "isDefault": true
+                     *         },
+                     *         {
+                     *           "id": "813744226420795901",
+                     *           "name": "Drafts",
+                     *           "privacy": "SECRET",
+                     *           "isDefault": false
+                     *         }
+                     *       ],
+                     *       "defaultBoardId": "813744226420795883"
+                     *     }
+                     */
                     "application/json": components["schemas"]["PinterestBoardList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_NEEDS_RECONNECT`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -3974,6 +7058,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4002,6 +7102,11 @@ export interface operations {
         };
         requestBody?: {
             content: {
+                /**
+                 * @example {
+                 *       "boardId": "813744226420795883"
+                 *     }
+                 */
                 "application/json": components["schemas"]["SetPinterestBoardRequest"];
             };
         };
@@ -4026,7 +7131,136 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "6b1f3d8a-4e2c-4a9b-8d7f-2c5e9a1b3d70",
+                     *       "platform": "pinterest",
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "platformAccountId": "813744295139952108",
+                     *       "username": "ampost_io",
+                     *       "avatarUrl": null,
+                     *       "status": "active",
+                     *       "scopes": [
+                     *         "user_accounts:read",
+                     *         "boards:read",
+                     *         "boards:write",
+                     *         "pins:read",
+                     *         "pins:write"
+                     *       ],
+                     *       "tokenExpiresAt": "2026-11-06T10:00:00.000Z",
+                     *       "tokenHealth": "healthy",
+                     *       "health": {
+                     *         "canPost": true,
+                     *         "needsReconnect": false,
+                     *         "issues": []
+                     *       },
+                     *       "platformMetadata": {
+                     *         "displayName": "Ampost",
+                     *         "accountType": "BUSINESS",
+                     *         "boardId": "813744226420795883",
+                     *         "boardName": "Product launches"
+                     *       },
+                     *       "analytics": {
+                     *         "available": true,
+                     *         "optInRequired": false,
+                     *         "enabled": true
+                     *       },
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-07T10:00:00.000Z",
+                     *       "lastUsedAt": "2026-10-06T09:00:04.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Account"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_NEEDS_RECONNECT`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4045,6 +7279,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4073,6 +7323,12 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "platform": "instagram",
+                 *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40"
+                 *     }
+                 */
                 "application/json": components["schemas"]["ConnectAccountRequest"];
             };
         };
@@ -4099,7 +7355,109 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "11111111-1111-4111-8111-111111111111",
+                     *       "platform": "instagram",
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "status": "pending",
+                     *       "reconnectAccountId": null,
+                     *       "expectedPlatformAccountId": null,
+                     *       "expectedUsername": null,
+                     *       "redirectUrl": null,
+                     *       "connectUrl": "https://ampost.io/connect/11111111-1111-4111-8111-111111111111#token=one-time-token",
+                     *       "createdAt": "2026-10-06T12:00:00.000Z",
+                     *       "expiresAt": "2026-10-06T12:10:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["ConnectRequestCreated"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `ACCOUNT_LIMIT_REACHED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`, `PLATFORM_ALREADY_CONNECTED`, `CONNECT_IN_PROGRESS`, `SOCIAL_ACCOUNT_IN_USE`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4118,6 +7476,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4166,7 +7540,104 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "11111111-1111-4111-8111-111111111111",
+                     *       "platform": "instagram",
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "status": "connected",
+                     *       "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *       "reconnectAccountId": null,
+                     *       "expectedPlatformAccountId": null,
+                     *       "expectedUsername": null,
+                     *       "redirectUrl": null,
+                     *       "error": null,
+                     *       "createdAt": "2026-10-06T12:00:00.000Z",
+                     *       "expiresAt": "2026-10-06T12:10:00.000Z",
+                     *       "completedAt": "2026-10-06T12:02:14.000Z",
+                     *       "updatedAt": "2026-10-06T12:02:14.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["ConnectRequest"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `CONNECT_REQUEST_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4185,6 +7656,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4235,7 +7722,103 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "id": "9a2c4e6b-1d3f-4a5c-8e7b-2f4d6a8c0e10",
+                     *           "name": "default",
+                     *           "isDefault": true,
+                     *           "accountCount": 3,
+                     *           "createdAt": "2026-10-01T08:00:00.000Z",
+                     *           "updatedAt": "2026-10-01T08:00:00.000Z"
+                     *         },
+                     *         {
+                     *           "id": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "name": "Client A",
+                     *           "isDefault": false,
+                     *           "accountCount": 2,
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-06T09:00:00.000Z"
+                     *         }
+                     *       ],
+                     *       "pagination": {
+                     *         "limit": 20,
+                     *         "offset": 0,
+                     *         "total": 2,
+                     *         "hasMore": false
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["PlatformSetList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4254,6 +7837,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4282,6 +7881,11 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Client A"
+                 *     }
+                 */
                 "application/json": components["schemas"]["PlatformSetRequest"];
             };
         };
@@ -4308,7 +7912,104 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "name": "Client A",
+                     *       "isDefault": false,
+                     *       "accountCount": 2,
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["PlatformSet"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`, `PLATFORM_SET_LIMIT_REACHED`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4327,6 +8028,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4375,7 +8092,96 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "name": "Client A",
+                     *       "isDefault": false,
+                     *       "accountCount": 2,
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["PlatformSet"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4394,6 +8200,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4442,7 +8264,103 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "deleted": true
+                     *     }
+                     */
                     "application/json": components["schemas"]["Deleted"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `LAST_PLATFORM_SET`, `PLATFORM_SET_IN_USE`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4461,6 +8379,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4489,6 +8423,11 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "name": "Client A"
+                 *     }
+                 */
                 "application/json": components["schemas"]["PlatformSetRequest"];
             };
         };
@@ -4513,7 +8452,96 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "name": "Client A",
+                     *       "isDefault": false,
+                     *       "accountCount": 2,
+                     *       "createdAt": "2026-10-06T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-06T09:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["PlatformSet"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4532,6 +8560,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4580,7 +8624,107 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "timezone": "Europe/Warsaw",
+                     *       "slots": [
+                     *         {
+                     *           "day": "monday",
+                     *           "time": "09:00"
+                     *         },
+                     *         {
+                     *           "day": "wednesday",
+                     *           "time": "12:30"
+                     *         },
+                     *         {
+                     *           "day": "friday",
+                     *           "time": "17:00"
+                     *         }
+                     *       ],
+                     *       "updatedAt": "2026-10-06T09:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Queue"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4599,6 +8743,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4627,6 +8787,25 @@ export interface operations {
         };
         requestBody?: {
             content: {
+                /**
+                 * @example {
+                 *       "timezone": "Europe/Warsaw",
+                 *       "slots": [
+                 *         {
+                 *           "day": "monday",
+                 *           "time": "09:00"
+                 *         },
+                 *         {
+                 *           "day": "wednesday",
+                 *           "time": "12:30"
+                 *         },
+                 *         {
+                 *           "day": "friday",
+                 *           "time": "17:00"
+                 *         }
+                 *       ]
+                 *     }
+                 */
                 "application/json": components["schemas"]["UpdateQueueRequest"];
             };
         };
@@ -4651,7 +8830,107 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "timezone": "Europe/Warsaw",
+                     *       "slots": [
+                     *         {
+                     *           "day": "monday",
+                     *           "time": "09:00"
+                     *         },
+                     *         {
+                     *           "day": "wednesday",
+                     *           "time": "12:30"
+                     *         },
+                     *         {
+                     *           "day": "friday",
+                     *           "time": "17:00"
+                     *         }
+                     *       ],
+                     *       "updatedAt": "2026-10-06T09:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Queue"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `UPGRADE_REQUIRED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4670,6 +8949,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4723,7 +9018,106 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "timezone": "Europe/Warsaw",
+                     *       "slots": [
+                     *         {
+                     *           "scheduledFor": "2027-01-11T08:00:00.000Z",
+                     *           "postId": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10"
+                     *         },
+                     *         {
+                     *           "scheduledFor": "2027-01-13T11:30:00.000Z",
+                     *           "postId": null
+                     *         },
+                     *         {
+                     *           "scheduledFor": "2027-01-15T16:00:00.000Z",
+                     *           "postId": null
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": components["schemas"]["QueuePreview"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `PLATFORM_SET_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4742,6 +9136,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4800,7 +9210,154 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "postId": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *           "status": "published",
+                     *           "text": "Launch day: Ampost publishes everywhere from one API.",
+                     *           "createdAt": "2026-10-06T09:00:00.000Z",
+                     *           "platformPosts": [
+                     *             {
+                     *               "platform": "instagram",
+                     *               "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *               "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *               "platformPostId": "17912345678901234",
+                     *               "publishedUrl": "https://www.instagram.com/p/C9xYz12AbCd/",
+                     *               "publishedAt": "2026-10-06T09:00:04.000Z",
+                     *               "contentType": "image",
+                     *               "analyticsStatus": "available",
+                     *               "metrics": {
+                     *                 "views": 1840,
+                     *                 "reach": 1210,
+                     *                 "likes": 96,
+                     *                 "comments": 12,
+                     *                 "shares": 7,
+                     *                 "saves": 15,
+                     *                 "quotes": null
+                     *               },
+                     *               "syncedAt": "2026-10-08T10:12:00.000Z"
+                     *             },
+                     *             {
+                     *               "platform": "facebook",
+                     *               "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *               "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *               "platformPostId": "104857600000000_122100000000000",
+                     *               "publishedUrl": "https://www.facebook.com/104857600000000/posts/122100000000000",
+                     *               "publishedAt": "2026-10-06T09:00:04.000Z",
+                     *               "contentType": "image",
+                     *               "analyticsStatus": "available",
+                     *               "metrics": {
+                     *                 "views": 920,
+                     *                 "reach": 640,
+                     *                 "likes": 41,
+                     *                 "comments": 3,
+                     *                 "shares": 5,
+                     *                 "saves": null,
+                     *                 "quotes": null
+                     *               },
+                     *               "syncedAt": "2026-10-08T10:14:00.000Z"
+                     *             }
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "pagination": {
+                     *         "limit": 20,
+                     *         "offset": 0,
+                     *         "total": 1,
+                     *         "hasMore": false
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["AnalyticsPostList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`, `ANALYTICS_NOT_ENABLED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `POST_NOT_FOUND`, `ACCOUNT_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "POST_NOT_FOUND",
+                     *         "message": "Post not found."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4819,6 +9376,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4875,7 +9448,147 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "from": "2026-09-09",
+                     *       "to": "2026-10-08",
+                     *       "totals": {
+                     *         "posts": 14,
+                     *         "followers": 5320,
+                     *         "followersChange": 142,
+                     *         "metrics": {
+                     *           "views": 21800,
+                     *           "reach": 15400,
+                     *           "likes": 1130,
+                     *           "comments": 96,
+                     *           "shares": 61,
+                     *           "saves": 140,
+                     *           "quotes": null
+                     *         }
+                     *       },
+                     *       "accounts": [
+                     *         {
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platform": "instagram",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "username": "ampost",
+                     *           "posts": 9,
+                     *           "followers": 4100,
+                     *           "followersChange": 120,
+                     *           "metrics": {
+                     *             "views": 16200,
+                     *             "reach": 11300,
+                     *             "likes": 870,
+                     *             "comments": 71,
+                     *             "shares": 40,
+                     *             "saves": 140,
+                     *             "quotes": null
+                     *           },
+                     *           "syncState": "up_to_date",
+                     *           "syncedAt": "2026-10-08T10:12:00.000Z",
+                     *           "nextSyncAt": "2026-10-08T11:12:00.000Z"
+                     *         },
+                     *         {
+                     *           "accountId": "8d3b6f1a-2c9e-4a7d-b5f3-1e6a9c2d7b30",
+                     *           "platform": "facebook",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "username": "Ampost",
+                     *           "posts": 5,
+                     *           "followers": 1220,
+                     *           "followersChange": 22,
+                     *           "metrics": {
+                     *             "views": 5600,
+                     *             "reach": 4100,
+                     *             "likes": 260,
+                     *             "comments": 25,
+                     *             "shares": 21,
+                     *             "saves": null,
+                     *             "quotes": null
+                     *           },
+                     *           "syncState": "up_to_date",
+                     *           "syncedAt": "2026-10-08T10:14:00.000Z",
+                     *           "nextSyncAt": "2026-10-08T11:14:00.000Z"
+                     *         }
+                     *       ],
+                     *       "unavailableAccounts": [
+                     *         {
+                     *           "accountId": "5e9a1c3d-7b2f-4d8e-a6c1-3f9b2e7d4a60",
+                     *           "platform": "linkedin",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "reason": "platform_disabled"
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": components["schemas"]["AnalyticsOverview"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`, `ANALYTICS_NOT_ENABLED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4894,6 +9607,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -4954,7 +9683,114 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "accountId": "c41d8e2f-6a3b-4f9c-b1e5-7d2a9c4e6f80",
+                     *           "platform": "instagram",
+                     *           "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *           "username": "ampost",
+                     *           "followers": 4100,
+                     *           "syncedAt": "2026-10-08T10:12:00.000Z",
+                     *           "totalLikes": null,
+                     *           "totalPosts": null,
+                     *           "history": [
+                     *             {
+                     *               "date": "2026-10-06",
+                     *               "followers": 4062,
+                     *               "syncedAt": "2026-10-06T10:05:00.000Z"
+                     *             },
+                     *             {
+                     *               "date": "2026-10-07",
+                     *               "followers": 4081,
+                     *               "syncedAt": "2026-10-07T10:09:00.000Z"
+                     *             },
+                     *             {
+                     *               "date": "2026-10-08",
+                     *               "followers": 4100,
+                     *               "syncedAt": "2026-10-08T10:12:00.000Z"
+                     *             }
+                     *           ]
+                     *         }
+                     *       ],
+                     *       "pagination": {
+                     *         "limit": 20,
+                     *         "offset": 0,
+                     *         "total": 1,
+                     *         "hasMore": false
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["AnalyticsFollowersList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `UPGRADE_REQUIRED`, `PLATFORM_COMING_SOON`, `ACCOUNT_SUSPENDED`, `ANALYTICS_NOT_ENABLED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -4973,6 +9809,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5023,7 +9875,107 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "id": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *           "url": "https://example.com/ampost/webhooks",
+                     *           "description": "Production receiver",
+                     *           "events": [
+                     *             "post.published",
+                     *             "post.partial",
+                     *             "post.failed",
+                     *             "account.needs_reconnect"
+                     *           ],
+                     *           "secretPreview": "whsec_…nM8q",
+                     *           "enabled": true,
+                     *           "disabledReason": null,
+                     *           "disabledAt": null,
+                     *           "consecutiveFailures": 0,
+                     *           "lastDeliveryAt": "2026-10-08T15:00:01.000Z",
+                     *           "lastSuccessAt": "2026-10-08T15:00:01.000Z",
+                     *           "createdAt": "2026-10-01T09:00:00.000Z",
+                     *           "updatedAt": "2026-10-01T09:00:00.000Z"
+                     *         }
+                     *       ],
+                     *       "pagination": {
+                     *         "limit": 20,
+                     *         "offset": 0,
+                     *         "total": 1,
+                     *         "hasMore": false
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["WebhookList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5042,6 +9994,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5070,6 +10038,18 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "url": "https://example.com/ampost/webhooks",
+                 *       "events": [
+                 *         "post.published",
+                 *         "post.partial",
+                 *         "post.failed",
+                 *         "account.needs_reconnect"
+                 *       ],
+                 *       "description": "Production receiver"
+                 *     }
+                 */
                 "application/json": components["schemas"]["CreateWebhookRequest"];
             };
         };
@@ -5096,7 +10076,117 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *       "url": "https://example.com/ampost/webhooks",
+                     *       "description": "Production receiver",
+                     *       "events": [
+                     *         "post.published",
+                     *         "post.partial",
+                     *         "post.failed",
+                     *         "account.needs_reconnect"
+                     *       ],
+                     *       "secretPreview": "whsec_…nM8q",
+                     *       "enabled": true,
+                     *       "disabledReason": null,
+                     *       "disabledAt": null,
+                     *       "consecutiveFailures": 0,
+                     *       "lastDeliveryAt": "2026-10-08T15:00:01.000Z",
+                     *       "lastSuccessAt": "2026-10-08T15:00:01.000Z",
+                     *       "createdAt": "2026-10-01T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-01T09:00:00.000Z",
+                     *       "secret": "whsec_Jx2nQ8vR4tY6uI0oP3aS5dF7gH9jK1lZ2xC4vB6nM8q"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Webhook"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`, `WEBHOOK_LIMIT_REACHED`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5115,6 +10205,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5163,7 +10269,108 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *       "url": "https://example.com/ampost/webhooks",
+                     *       "description": "Production receiver",
+                     *       "events": [
+                     *         "post.published",
+                     *         "post.partial",
+                     *         "post.failed",
+                     *         "account.needs_reconnect"
+                     *       ],
+                     *       "secretPreview": "whsec_…nM8q",
+                     *       "enabled": true,
+                     *       "disabledReason": null,
+                     *       "disabledAt": null,
+                     *       "consecutiveFailures": 0,
+                     *       "lastDeliveryAt": "2026-10-08T15:00:01.000Z",
+                     *       "lastSuccessAt": "2026-10-08T15:00:01.000Z",
+                     *       "createdAt": "2026-10-01T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-01T09:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Webhook"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `WEBHOOK_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5182,6 +10389,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5230,7 +10453,92 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                     *       "deleted": true
+                     *     }
+                     */
                     "application/json": components["schemas"]["Deleted"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `WEBHOOK_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5249,6 +10557,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5277,6 +10601,11 @@ export interface operations {
         };
         requestBody?: {
             content: {
+                /**
+                 * @example {
+                 *       "enabled": true
+                 *     }
+                 */
                 "application/json": components["schemas"]["UpdateWebhookRequest"];
             };
         };
@@ -5301,7 +10630,108 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *       "url": "https://example.com/ampost/webhooks",
+                     *       "description": "Production receiver",
+                     *       "events": [
+                     *         "post.published",
+                     *         "post.partial",
+                     *         "post.failed",
+                     *         "account.needs_reconnect"
+                     *       ],
+                     *       "secretPreview": "whsec_…nM8q",
+                     *       "enabled": true,
+                     *       "disabledReason": null,
+                     *       "disabledAt": null,
+                     *       "consecutiveFailures": 0,
+                     *       "lastDeliveryAt": "2026-10-08T15:00:01.000Z",
+                     *       "lastSuccessAt": "2026-10-08T15:00:01.000Z",
+                     *       "createdAt": "2026-10-01T09:00:00.000Z",
+                     *       "updatedAt": "2026-10-01T09:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["Webhook"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`, `WEBHOOK_KEY_REVOKED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `WEBHOOK_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5320,6 +10750,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5368,7 +10814,119 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "9f4b2e6d-8a1c-4d3e-b5f7-3c9a1e7d5b02",
+                     *       "webhookId": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *       "eventId": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *       "eventType": "post.published",
+                     *       "status": "succeeded",
+                     *       "attempts": 1,
+                     *       "maxAttempts": 1,
+                     *       "nextAttemptAt": null,
+                     *       "lastAttemptAt": "2026-10-08T15:00:01.000Z",
+                     *       "responseStatus": 200,
+                     *       "responseBody": "ok",
+                     *       "error": null,
+                     *       "durationMs": 84,
+                     *       "redeliveryOf": null,
+                     *       "payload": {
+                     *         "id": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *         "type": "post.published",
+                     *         "createdAt": "2026-10-08T15:00:00.000Z",
+                     *         "data": {
+                     *           "post": {
+                     *             "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *             "status": "published",
+                     *             "metadata": {
+                     *               "campaignId": "launch-2026"
+                     *             }
+                     *           }
+                     *         }
+                     *       },
+                     *       "createdAt": "2026-10-08T15:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["WebhookDelivery"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `WEBHOOK_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5387,6 +10945,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5440,7 +11014,160 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "id": "6b2d8f4a-1c3e-4a5b-9d7f-2e4c6a8b0d13",
+                     *           "webhookId": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *           "eventId": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *           "eventType": "post.published",
+                     *           "status": "pending",
+                     *           "attempts": 2,
+                     *           "maxAttempts": 8,
+                     *           "nextAttemptAt": "2026-10-08T15:06:30.000Z",
+                     *           "lastAttemptAt": "2026-10-08T15:01:30.000Z",
+                     *           "responseStatus": 500,
+                     *           "responseBody": "Internal Server Error",
+                     *           "error": "HTTP 500; only 2xx counts as delivered",
+                     *           "durationMs": 132,
+                     *           "redeliveryOf": null,
+                     *           "payload": {
+                     *             "id": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *             "type": "post.published",
+                     *             "createdAt": "2026-10-08T15:00:00.000Z",
+                     *             "data": {
+                     *               "post": {
+                     *                 "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *                 "status": "published",
+                     *                 "metadata": {
+                     *                   "campaignId": "launch-2026"
+                     *                 }
+                     *               }
+                     *             }
+                     *           },
+                     *           "createdAt": "2026-10-08T15:00:00.000Z"
+                     *         },
+                     *         {
+                     *           "id": "9f4b2e6d-8a1c-4d3e-b5f7-3c9a1e7d5b02",
+                     *           "webhookId": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *           "eventId": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *           "eventType": "post.published",
+                     *           "status": "succeeded",
+                     *           "attempts": 1,
+                     *           "maxAttempts": 8,
+                     *           "nextAttemptAt": null,
+                     *           "lastAttemptAt": "2026-10-08T15:00:01.000Z",
+                     *           "responseStatus": 200,
+                     *           "responseBody": "ok",
+                     *           "error": null,
+                     *           "durationMs": 84,
+                     *           "redeliveryOf": null,
+                     *           "payload": {
+                     *             "id": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *             "type": "post.published",
+                     *             "createdAt": "2026-10-08T15:00:00.000Z",
+                     *             "data": {
+                     *               "post": {
+                     *                 "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *                 "status": "published",
+                     *                 "metadata": {
+                     *                   "campaignId": "launch-2026"
+                     *                 }
+                     *               }
+                     *             }
+                     *           },
+                     *           "createdAt": "2026-10-08T15:00:00.000Z"
+                     *         }
+                     *       ],
+                     *       "pagination": {
+                     *         "limit": 20,
+                     *         "offset": 0,
+                     *         "total": 2,
+                     *         "hasMore": false
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["WebhookDeliveryList"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `WEBHOOK_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5459,6 +11186,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5509,7 +11252,119 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "9f4b2e6d-8a1c-4d3e-b5f7-3c9a1e7d5b02",
+                     *       "webhookId": "d3a7c1e9-5b2f-4a8d-9e6c-7f1b3d5a9c21",
+                     *       "eventId": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *       "eventType": "post.published",
+                     *       "status": "succeeded",
+                     *       "attempts": 1,
+                     *       "maxAttempts": 1,
+                     *       "nextAttemptAt": null,
+                     *       "lastAttemptAt": "2026-10-08T15:00:01.000Z",
+                     *       "responseStatus": 200,
+                     *       "responseBody": "ok",
+                     *       "error": null,
+                     *       "durationMs": 84,
+                     *       "redeliveryOf": null,
+                     *       "payload": {
+                     *         "id": "2c8e4a6f-1b3d-4f5a-9e7c-8d2b4f6a1c35",
+                     *         "type": "post.published",
+                     *         "createdAt": "2026-10-08T15:00:00.000Z",
+                     *         "data": {
+                     *           "post": {
+                     *             "id": "7f1c2a9e-4b1d-4c55-9a0e-2f6d8b3c1a10",
+                     *             "status": "published",
+                     *             "metadata": {
+                     *               "campaignId": "launch-2026"
+                     *             }
+                     *           }
+                     *         }
+                     *       },
+                     *       "createdAt": "2026-10-08T15:00:00.000Z"
+                     *     }
+                     */
                     "application/json": components["schemas"]["WebhookDelivery"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `INSUFFICIENT_SCOPE`, `PLATFORM_SET_NOT_ALLOWED`, `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "INSUFFICIENT_SCOPE",
+                     *         "message": "This API key or connected app does not have the posts:write scope that posts_create needs. Create a key with it at https://ampost.io/app/settings/api-keys, or connect the app again and allow posts:write.",
+                     *         "details": {
+                     *           "requiredScope": "posts:write"
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `WEBHOOK_NOT_FOUND`, `DELIVERY_NOT_FOUND`. Each code is described under Errors in the docs. */
+            404: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5528,6 +11383,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5572,7 +11443,82 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "data": [
+                     *         {
+                     *           "id": "posts/posts_create",
+                     *           "title": "Create, schedule or publish a post (posts_create)",
+                     *           "url": "https://ampost.io/docs#posts_create",
+                     *           "excerpt": "| `useQueue` | body | boolean | no | Schedule the post in the next free slot of its platform set's queue (see queue_get) instead of at `scheduledFor`."
+                     *         },
+                     *         {
+                     *           "id": "platforms/instagram",
+                     *           "title": "Instagram",
+                     *           "url": "https://ampost.io/docs#platforms",
+                     *           "excerpt": "- To post to Instagram, name `instagram` in `targets[].platforms`; its settings go in `options.instagram`."
+                     *         }
+                     *       ]
+                     *     }
+                     */
                     "application/json": components["schemas"]["DocsSearchResults"];
+                };
+            };
+            /** @description `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5591,6 +11537,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
@@ -5619,6 +11581,36 @@ export interface operations {
         };
         requestBody: {
             content: {
+                /**
+                 * @example {
+                 *       "kind": "bug",
+                 *       "message": "Scheduling a Facebook post for next Monday fails, though the account shows as healthy.",
+                 *       "route": "/api/posts",
+                 *       "request": {
+                 *         "method": "POST",
+                 *         "path": "/api/posts",
+                 *         "requestId": "req_8c1f2a9d4b7e4c0a",
+                 *         "body": {
+                 *           "targets": [
+                 *             {
+                 *               "platformSetId": "0b6e4d2a-9c3f-4e1b-8a7d-5f2c1e9b3d40",
+                 *               "platforms": [
+                 *                 "facebook"
+                 *               ]
+                 *             }
+                 *           ],
+                 *           "text": "Launch day",
+                 *           "scheduledFor": "2027-01-18T09:00:00.000Z"
+                 *         }
+                 *       },
+                 *       "error": {
+                 *         "status": 500,
+                 *         "code": "INTERNAL_ERROR",
+                 *         "message": "Something went wrong",
+                 *         "requestId": "req_8c1f2a9d4b7e4c0a"
+                 *       }
+                 *     }
+                 */
                 "application/json": {
                     /**
                      * @description `bug` for something that went wrong, `suggestion` for a change you want
@@ -5695,7 +11687,97 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "id": "6a0d3f52-1c4b-4e8e-9a51-3f7b2c9d8e10",
+                     *       "kind": "bug",
+                     *       "createdAt": "2026-10-23T09:14:00.000Z",
+                     *       "attached": [
+                     *         "route",
+                     *         "request",
+                     *         "error",
+                     *         "plan",
+                     *         "accounts"
+                     *       ]
+                     *     }
+                     */
                     "application/json": components["schemas"]["FeedbackReceipt"];
+                };
+            };
+            /** @description `INVALID_REQUEST`, `VALIDATION_FAILED`. Each code is described under Errors in the docs. */
+            400: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "VALIDATION_FAILED",
+                     *         "message": "media[0].type: Invalid option: expected one of \"image\"|\"video\"",
+                     *         "details": {
+                     *           "issues": [
+                     *             {
+                     *               "path": "media[0].type",
+                     *               "message": "Invalid option: expected one of \"image\"|\"video\""
+                     *             }
+                     *           ]
+                     *         }
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `UNAUTHORIZED`. Each code is described under Errors in the docs. */
+            401: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "UNAUTHORIZED",
+                     *         "message": "Send a valid API key as Authorization: Bearer <API key>. Create one at https://ampost.io/app/settings/api-keys; docs: https://ampost.io/docs#authentication"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `ACCOUNT_SUSPENDED`. Each code is described under Errors in the docs. */
+            403: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description `IDEMPOTENCY_KEY_REUSED`, `IDEMPOTENCY_REQUEST_IN_PROGRESS`. Each code is described under Errors in the docs. */
+            409: {
+                headers: {
+                    /** @description Id of this request. A valid incoming `X-Request-Id` (8-128 of `A-Z a-z 0-9 . _ : -`) is echoed, otherwise one is generated. Quote it when you contact support. */
+                    "X-Request-Id"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "IDEMPOTENCY_KEY_REUSED",
+                     *         "message": "This idempotency key was already used for a different request. Send a new key for a new action."
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description `RATE_LIMITED` (the operation's bucket is empty) or `QUOTA_EXCEEDED` (the plan's 30-day API requests or post quota is used up). `details.retryAfterSeconds` matches `Retry-After`. */
@@ -5714,6 +11796,22 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    /**
+                     * @example {
+                     *       "error": {
+                     *         "code": "QUOTA_EXCEEDED",
+                     *         "message": "Post limit reached (15 posts in 30 days). It resets at 2026-11-05T09:00:00.000Z.",
+                     *         "details": {
+                     *           "quota": "postsPerMonth",
+                     *           "limit": 15,
+                     *           "used": 15,
+                     *           "resetsAt": "2026-11-05T09:00:00.000Z",
+                     *           "tier": "free",
+                     *           "upgradeUrl": "https://ampost.io/app/settings/billing"
+                     *         }
+                     *       }
+                     *     }
+                     */
                     "application/json": components["schemas"]["Error"];
                 };
             };
