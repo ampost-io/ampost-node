@@ -2415,8 +2415,8 @@ export interface components {
             secretPreview: string;
             /** @description False when you turned the webhook off, or Ampost did */
             enabled: boolean;
-            /** @description `failing`: turned off by Ampost after deliveries kept failing. Fix the receiver, then set `enabled` to true. `key_revoked`: turned off because the API key or app that created it (or last changed its URL or secret) was revoked, or the app lost `webhooks:write`. Only the account owner can turn it back on, in the Ampost dashboard; the API refuses with `WEBHOOK_KEY_REVOKED`. */
-            disabledReason: ("failing" | "key_revoked") | null;
+            /** @description `failing`: turned off by Ampost after deliveries kept failing. Fix the receiver, then set `enabled` to true. `key_revoked`: turned off because the API key or app that created it (or last changed its URL or secret) was revoked, or the app lost `webhooks:write`. Only the account owner can turn it back on, in the Ampost dashboard; the API refuses with `WEBHOOK_KEY_REVOKED`. `member_left`: turned off because the person who added it (or last changed its URL) left the account; check the URL before setting `enabled` to true. */
+            disabledReason: ("failing" | "key_revoked" | "member_left") | null;
             disabledAt: string | null;
             /** @description Deliveries in a row that failed after all retries; a success resets it */
             consecutiveFailures: number;
